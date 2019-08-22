@@ -23,18 +23,8 @@ export default class LoginScreen extends React.Component {
         <View >
           
         </View>
-
-        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, }}>
-          <View style={{flexDirection: 'row', padding: 20, }}>
-            <TouchableOpacity  onPress={ () => this.props.navigation.navigate('Login') }>
-              <Text adjustFontSizeToFit numberOfLines={1} > Нэвтрэх </Text>
-            </TouchableOpacity>
-            <View style={{ width: 20, }} />
-            <TouchableOpacity onPress={ () => this.props.navigation.navigate('Register') } >
-              <Text adjustFontSizeToFit numberOfLines={1}> Бүртгүүлэх </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <Text>ene login huudas n</Text>
+        
           
       </View>
     )
