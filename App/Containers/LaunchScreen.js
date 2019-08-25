@@ -16,7 +16,7 @@ import { Images } from '../Themes'
 
 // Styles
 
-export default class LoginScreen extends React.Component {
+export default class LaunchScreen extends React.Component {
   render () {
     return (
       <View style={styles.container}>
@@ -26,7 +26,7 @@ export default class LoginScreen extends React.Component {
 
         <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, }}>
           <View style={{flexDirection: 'row', padding: 20, }}>
-            <TouchableOpacity  onPress={ () => this.props.navigation.navigate('Login') }>
+            <TouchableOpacity  onPress={ () => this.props.navigation.navigate('LoginScreen') }>
               <Text adjustFontSizeToFit numberOfLines={1} > Нэвтрэх </Text>
             </TouchableOpacity>
             <View style={{ width: 20, }} />
