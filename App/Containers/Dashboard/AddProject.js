@@ -8,7 +8,7 @@ export default class ProfileScreen extends React.Component {
   //Profile Screen to show from Open profile button
   render() {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center',backgroundColor: '#DCDCDC', alignItems: 'center' }}>
         <Text>AddProjects</Text>
       </View>
     );

@@ -8,7 +8,7 @@ export default class HomeScreen extends React.Component {
   //Home Screen to show in Home Option
   render() {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center',backgroundColor: '#DCDCDC', alignItems: 'center' }}>
         <Text style={{ marginTop: 50, fontSize: 25 }}>Home!</Text>
         
       </View>
@@ -18,7 +18,7 @@ export default class HomeScreen extends React.Component {
 const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
-    backgroundColor: '#DDDDDD',
+    backgroundColor: '#DCDCDC',
     padding: 10,
     width: 300,
     marginTop: 16,

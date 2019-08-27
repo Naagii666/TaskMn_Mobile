@@ -1,6 +1,6 @@
 //import { createStackNavigator, createAppContainer } from 'react-navigation'
 import LaunchScreen from '../Containers/LaunchScreen'
-import LoginScreen from '../Containers/LoginScreen'
+import LoginScreen from '../Containers/Login/LoginScreen'
 import HomeScreen from '../Containers/Dashboard/HomeScreen'
 import Profile from '../Containers/Dashboard/Profile'
 import AddProject from '../Containers/Dashboard/AddProject'
@@ -11,6 +11,7 @@ import {
   createStackNavigator,
   createBottomTabNavigator,
   createAppContainer,
+  createDrawerNavigator,
 } from 'react-navigation';
 import React,{Component} from 'react';
 // Manifest of possible screens
@@ -33,7 +34,7 @@ import React,{Component} from 'react';
 //   }
 // );
 
-var isLoggedIn: false
+var isLoggedIn= false
 const HomeStack = createStackNavigator(
   {
     //Defination of Navigaton from home screen
@@ -44,10 +45,10 @@ const HomeStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#42f44b',
+        backgroundColor: '#1764AA',
       },
       headerTintColor: '#FFFFFF',
-      title: 'Нүүр',
+      title: 'iwork.mn',
       //Header title
     },
   }
@@ -62,7 +63,7 @@ const ProfileStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#42f44b',
+        backgroundColor: '#1764AA',
       },
       headerTintColor: '#FFFFFF',
       title: 'Профайл',
@@ -80,7 +81,7 @@ const MyProjectsStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#42f44b',
+        backgroundColor: '#1764AA',
       },
       headerTintColor: '#FFFFFF',
       title: 'Миний төслүүд',
@@ -98,7 +99,7 @@ const AddProjectSrack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#42f44b',
+        backgroundColor: '#1764AA',
       },
       headerTintColor: '#FFFFFF',
       title: 'Төсөл нэмэх',
@@ -119,7 +120,10 @@ const Login = createStackNavigator({
       header: null,
     }
    },
+},{
+  initialRouteName:'LoginScreen'
 })
+
 const App = createBottomTabNavigator(
   {
     Нүүр: { screen: HomeStack },
@@ -146,12 +150,19 @@ const App = createBottomTabNavigator(
       },
     }),
     tabBarOptions: {
-      activeTintColor: '#42f44b',
+      activeTintColor: '#3498db',
       inactiveTintColor: 'gray',
     },
   }
 );
+const Drawer = createDrawerNavigator({
+  Stack:{screen:Login},
+  Tabs:{screen:App},
+},{
+  edgeWidth:0
+
+})
 //For React Navigation 2.+ need to export App only
 //export default App;
 //For React Navigation 3.+
-export default createAppContainer(isLoggedIn?App:Login);
+export default createAppContainer(Drawer);
