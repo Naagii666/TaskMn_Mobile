@@ -1,4 +1,4 @@
-import { takeLatest, all } from 'redux-saga/effects'
+import { takeLatest, all,fork } from 'redux-saga/effects'
 import API from '../Services/Api'
 import FixtureAPI from '../Services/FixtureApi'
 import DebugConfig from '../Config/DebugConfig'
@@ -12,6 +12,9 @@ import { GithubTypes } from '../Redux/GithubRedux'
 
 import { startup } from './StartupSagas'
 import { getUserAvatar } from './GithubSagas'
+import projectsSaga from '../Containers/Projects/ProjectsSaga'
+import profileSaga from '../Containers/Profile/ProfileSaga'
+import workersSaga from '../Containers/Workers/WorkersSaga'
 
 /* ------------- API ------------- */
 
@@ -23,6 +26,9 @@ const api = DebugConfig.useFixtures ? FixtureAPI : API.create()
 
 export default function * root () {
   yield all([
+  	fork(projectsSaga),
+  	fork(profileSaga),
+  	fork(workersSaga),
     // some sagas only receive an action
     takeLatest(StartupTypes.STARTUP, startup),
 

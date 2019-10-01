@@ -22,6 +22,8 @@ const images = {
   closeButton: require('../Images/Icons/close-button.png'),
   loginBG: require('../Images/background.png'),
   loginLogo: require('../Images/logo.png'),
+  logo_taskmn3: require('../Images/logo_taskmn3.png'),
+  a: require('../Images/a.png'),
 }
 
 export default images

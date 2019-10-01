@@ -1,10 +1,14 @@
 //import { createStackNavigator, createAppContainer } from 'react-navigation'
+import { Button,View,TouchableOpacity,Text} from 'react-native'
 import LaunchScreen from '../Containers/LaunchScreen'
 import LoginScreen from '../Containers/Login/LoginScreen'
 import HomeScreen from '../Containers/Dashboard/HomeScreen'
-import Profile from '../Containers/Dashboard/Profile'
+// import Profile from '../Containers/Dashboard/Profile'
 import AddProject from '../Containers/Dashboard/AddProject'
-import MyProjects from '../Containers/Dashboard/MyProjects'
+import MyProjects from '../Containers/Projects/ProjectsView'
+import ProjectDetail from '../Containers/Projects/ProjectDetail'
+import Profile from '../Containers/Profile/ProfileView'
+import Workers from '../Containers/Workers/WorkersView'
 import styles from './Styles/NavigationStyles'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
@@ -45,10 +49,10 @@ const HomeStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#1764AA',
+        backgroundColor: '#3679B1',
       },
       headerTintColor: '#FFFFFF',
-      title: 'iwork.mn',
+      title: 'Messenger',
       //Header title
     },
   }
@@ -57,13 +61,14 @@ const ProfileStack = createStackNavigator(
   {
     //Defination of Navigaton from setting screen
     Profile: { screen: Profile },
+    
   },
   {
     //For React Navigation 2.+ change defaultNavigationOptions->navigationOptions
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#1764AA',
+        backgroundColor: '#3679B1',
       },
       headerTintColor: '#FFFFFF',
       title: 'Профайл',
@@ -71,6 +76,7 @@ const ProfileStack = createStackNavigator(
     },
   }
 );
+
 const MyProjectsStack = createStackNavigator(
   {
     //Defination of Navigaton from setting screen
@@ -81,10 +87,10 @@ const MyProjectsStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#1764AA',
+        backgroundColor: '#3679B1',
       },
       headerTintColor: '#FFFFFF',
-      title: 'Миний төслүүд',
+      title: 'Төслүүд',
       //Header title
     },
   }
@@ -99,10 +105,28 @@ const AddProjectSrack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#1764AA',
+        backgroundColor: '#3679B1',
       },
       headerTintColor: '#FFFFFF',
       title: 'Төсөл нэмэх',
+      //Header title
+    },
+  }
+);
+const WorkersSrack = createStackNavigator(
+  {
+    //Defination of Navigaton from setting screen
+    Workers: { screen: Workers },
+  },
+  {
+    //For React Navigation 2.+ change defaultNavigationOptions->navigationOptions
+    defaultNavigationOptions: {
+      //Header customization of the perticular Screen
+      headerStyle: {
+        backgroundColor: '#3679B1',
+      },
+      headerTintColor: '#FFFFFF',
+      title: 'Харилцагчид',
       //Header title
     },
   }
@@ -112,6 +136,20 @@ const Login = createStackNavigator({
     screen: LaunchScreen,
     navigationOptions: {
       header: null,
+    }
+   },
+  ProjectDetail: {
+    screen: ProjectDetail,
+    navigationOptions: {
+      headerStyle: {
+        backgroundColor: '#3679B1',
+      },
+      headerTitle: 'Дэлгэрэнгүй',
+      headerLeft: (
+        this.Drawer.Tabs
+      ),
+      headerTintColor: '#FFFFFF',
+      //Header title
     }
    },
    LoginScreen: {
@@ -126,9 +164,10 @@ const Login = createStackNavigator({
 
 const App = createBottomTabNavigator(
   {
-    Нүүр: { screen: HomeStack },
-    Нэмэх: {screen: AddProjectSrack},
+    Messenger: { screen: HomeStack },
     Төслүүд: { screen: MyProjectsStack },
+    Нэмэх: {screen: AddProjectSrack},
+    Workers: {screen: WorkersSrack},
     Профайл: { screen: ProfileStack },
   },
   {
@@ -137,20 +176,22 @@ const App = createBottomTabNavigator(
         const { routeName } = navigation.state;
         let IconComponent = Ionicons;
         let iconName;
-        if (routeName === 'Нүүр') {
-          iconName = `ios-home`;
+        if (routeName === 'Messenger') {
+          iconName = `ios-chatbubbles`;
         } else if (routeName === 'Профайл') {
-          iconName = `ios-contact`;
+          iconName = `ios-person`;
         } else if (routeName === 'Нэмэх') {
         	iconName = `ios-add-circle`;
         } else if (routeName === 'Төслүүд') {
         	iconName = `ios-briefcase`;
+        } else if (routeName === 'Workers') {
+          iconName = `ios-people`;
         }
         return <IconComponent name={iconName} size={25} color={tintColor} />;
       },
     }),
     tabBarOptions: {
-      activeTintColor: '#3498db',
+      activeTintColor: '#3679B1',
       inactiveTintColor: 'gray',
     },
   }
@@ -160,7 +201,6 @@ const Drawer = createDrawerNavigator({
   Tabs:{screen:App},
 },{
   edgeWidth:0
-
 })
 //For React Navigation 2.+ need to export App only
 //export default App;

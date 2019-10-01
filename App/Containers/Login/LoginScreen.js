@@ -12,8 +12,9 @@ import {
     StyleSheet,
     Alert,
     AsyncStorage,
-    ImageBackground
+    ImageBackground,
 } from 'react-native'
+import { Row, H2, H3, H4,H5, Wrapper, Separator } from '../../Components'
 import Icon from 'react-native-vector-icons/Entypo'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import axios from 'axios'
@@ -21,6 +22,7 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import _ from 'lodash'
 import SplashScreen from 'react-native-smart-splash-screen'
+import { setAuthenticationToken  } from '../../Services/storage'
 //import PushNotification from 'react-native-push-notification';
 //import PushNotificationAndroid from 'react-native-push-notification'
 import { Images } from '../../Themes'
@@ -45,99 +47,136 @@ class LoginScreen extends Component {
         delay: 500,
      })
   }
-  _onLoginFunction = () => {
+  // _onLoginFunction = () => {
+  //   var form = new FormData();
+  //   form.append("email", this.state.email);
+  //   form.append("password", this.state.password);
+
+  //       this.setState({
+  //           isLoggedIn: true,
+  //         });
+  //       if(this.state.isLoggedIn) {
+  //           this.props.navigation.navigate('Tabs')
+  //       } 
+  // }
+ _onLoginFunction = () => {
+    // alert('aaa');3
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
     var form = new FormData();
-    form.append("email", this.state.email);
-    form.append("password", this.state.password);
+    form.append("UserName", this.state.email);
+    form.append("Password", this.state.password);
+    form.append("grant_type", 'password');
+    const config = {
+      body: {
+        "UserName": this.state.email,
+        "Password": this.state.password,
+        "grant_type": 'password'
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }
 
-        this.setState({
-            isLoggedIn: true,
-          });
-        if(this.state.isLoggedIn) {
-            this.props.navigation.navigate('Tabs')
-        } 
+    ///testing
+    
+    
+    let token = 'J50SKrwNDxpj5sXUkz46Hokn1EbwaeA8o1xbzbeKeg4spjKFRQiCGeJC3l3wNRMtlNdIPAWCrvnEppbRNw8vAmW4071dP8_I9m_a6SuVVD0YI8EV-NPohROUOR32DQtJI30SVqirRkfTuSR_Zn06A0yRAeTcwq-vvnT3B7xOtDnhxz_OqrwWGKuAE9emcgEgaz6sB2edvnnOm9OvohPr14qH6TYSckVWRf_32w2aNBzPa797A60JDUH-Y3XXuGXS';
+    setAuthenticationToken(token);
+    let userData = {
+           auth_token: token,
+         }
+         let appState = {
+           isLoggedIn: true,
+           userData: userData
+         }
+    this.setState({
+           isLoggedIn: appState.isLoggedIn,
+           //user: appState.user
+         });
+    if(this.state.isLoggedIn) {
+           this.props.navigation.navigate('Tabs',{
+           })
+         }
+   // axios.post('https://taskmobile.conveyor.cloud/token',config)
+   //   .then(response => {
+   //     if(response.access_token!=null) {
+   //       //console.log(JSON.stringify(response.data.data));
+   //       let token = response.access_token.toString();
+   //       //let customers_id = response.data.data.customers_id.toString();
+   //       //let customers_picture = response.data.data.picture;
+   //       //let customer_name = response.data.data.user_name;
+
+   //       // let userData = {
+   //       //   name: response.data.data.name,
+   //       //   email: response.data.data.email,
+   //       //   auth_token: token,
+   //       //   customers_id: customers_id
+   //       // }
+
+   //       //console.log('login userData ' + JSON.stringify(userData))
+   //       setAuthenticationToken(token)
+   //       //setCustomerId(customers_id)
+
+   //       let appState = {
+   //         isLoggedIn: true,
+   //         userData: userData
+   //       }
+
+   //       this.setState({
+   //         isLoggedIn: appState.isLoggedIn,
+   //         //user: appState.user
+   //       });
+
+   //       if(this.state.isLoggedIn) {
+   //         this.props.navigation.navigate('Tabs',{
+   //           //url: customers_picture,
+   //           //name: customer_name
+   //         })
+   //       } else {
+   //         Alert.alert("Алдаа", "Хэрэглэгчийн мэйл/нууц үг буруу байна!");
+   //       }
+   //     }
+   //     else{
+   //       Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
+   //     }
+   //   }).catch(error => {
+   //       alert(error.message)
+   //       console.log(error);
+   //   });
   }
- // _onLoginFunction = () => {
- //    var form = new FormData();
- //    form.append("email", this.state.email);
- //    form.append("password", this.state.password);
-
- //    axios.post('http://124.158.124.60:8080/toilet/api/user/login',form)
- //      .then(response => {
- //        if(response.data.success) {
- //          console.log(JSON.stringify(response.data.data));
- //          let token = response.data.data.auth_token.toString();
- //          let customers_id = response.data.data.customers_id.toString();
- //          let customers_picture = response.data.data.picture;
- //          let customer_name = response.data.data.user_name;
-
- //          let userData = {
- //            name: response.data.data.name,
- //            email: response.data.data.email,
- //            auth_token: token,
- //            customers_id: customers_id
- //          }
-
- //          console.log('login userData ' + JSON.stringify(userData))
- //          setAuthenticationToken(token)
- //          setCustomerId(customers_id)
-
- //          let appState = {
- //            isLoggedIn: true,
- //            userData: userData
- //          }
-
- //          this.setState({
- //            isLoggedIn: appState.isLoggedIn,
- //            user: appState.user
- //          });
-
- //          if(this.state.isLoggedIn) {
- //            this.props.navigation.navigate('Dashboard',{
- //              url: customers_picture,
- //              name: customer_name
- //            })
- //          } else {
- //            Alert.alert("Алдаа", "Хэрэглэгчийн мэйл/нууц үг буруу байна!");
- //          }
- //        }
- //        else{
- //          Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
- //        }
- //      }).catch(error => {
- //          alert(error.message)
- //          console.log(error);
- //      });
- //  }
 render() {
     return (
-      // <ImageBackground source={Images.loginBG} style={{width: '100%',height:'100%', position: 'absolute'}}>
         <ScrollView style={Loginstyles.container}>
           <KeyboardAwareScrollView contentContainerStyle={Loginstyles.container2}
             resetScrollToCoords={{x:0,y:0}}
             scrollEnabled={false}>
-            <Image source={Images.loginLogo} />
+            <Image style={Loginstyles.logo} source={Images.logo_taskmn3} />
+            <View>
+            <Text style={{color:'#3679B1',margin:'10%'}}><H2>Онлайн ажил/төслийн платформ</H2></Text> 
+            </View>
             <View style={Loginstyles.buttons}>
               <View style={Loginstyles.inputContainer}>
-                <Icon name="mail" size={35} color="#1764AA" />
+                
                 <TextInput style={Loginstyles.inputs}
-                  placeholder="Email"
+                  placeholder="Хэрэглэгчийн нэр"
                   keyboardType="email-address"
                   underlineColorAndroid='transparent'
                   onChangeText={(email) => this.setState({email})}/>
+                  <Icon name="user" size={35} color="#3679B1" />
               </View>
         
               <View style={Loginstyles.inputContainer}>
-                <Icon name="key" size={35} color="#1764AA"/>
+                
                 <TextInput style={Loginstyles.inputs}
-                  placeholder="Password"
+                  placeholder="Нууц үг"
                   secureTextEntry={true}
                   underlineColorAndroid='transparent'
                   onChangeText={(password) => this.setState({password})}/>
+                  <Icon name="key" size={35} color="#3679B1"/>
               </View>
               <View style={Loginstyles.buttons}>
                 <TouchableOpacity style={[Loginstyles.buttonContainer, Loginstyles.loginButton]} 
-                  onPress={(e) => this._onLoginFunction(e)}>
+                  onPress={() => this._onLoginFunction()}>
                   <Text style={Loginstyles.loginText}>Нэвтрэх</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[Loginstyles.buttonContainer, Loginstyles.loginButton]} 
@@ -151,8 +190,6 @@ render() {
             </TouchableOpacity>
         </KeyboardAwareScrollView>
       </ScrollView>
-    // </ImageBackground>
-
     );
   }
 }
@@ -160,7 +197,7 @@ render() {
 const Loginstyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(23,100,170, 1)'
+    backgroundColor: '#fff'
   },
   container2: {
     paddingTop:'10%',
@@ -171,19 +208,29 @@ const Loginstyles = StyleSheet.create({
     marginTop:'10%'
   },
   inputContainer: {
-      borderBottomColor: '#1764AA',
+      borderBottomColor: '#fff',
       backgroundColor: 'rgba(255, 255, 255, 0.6)',
-      borderRadius:30,
-      borderBottomWidth: 1,
-      borderColor:'#1764AA',
-      borderWidth:1,
+      borderRadius:0,
+      borderBottomWidth: 0,
+      borderColor:'#fff',
+      borderWidth:0,
       width:'90%',
       height:45,
       marginBottom:20,
       flexDirection: 'row',
       alignItems:'center',
-      paddingLeft:10
-  },
+      paddingLeft:10,
+      backgroundColor:"#fff",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 1,
+      },
+      shadowOpacity: 0.22,
+      shadowRadius: 2.22,
+
+      elevation: 3,
+      },
   inputContainer1: {
     width:'90%',
     height:45,
@@ -194,7 +241,7 @@ const Loginstyles = StyleSheet.create({
   inputs:{
       height:45,
       marginLeft:16,
-      borderBottomColor: '#1764AA',
+      borderBottomColor: '#fff',
       flex:1,
   },
   inputIcon:{
@@ -218,7 +265,7 @@ const Loginstyles = StyleSheet.create({
     alignItems: 'center',
     marginBottom:20,
     width:'100%',
-    borderRadius:30,
+    // borderRadius:30,
   },
   facebook: {
     height:45,
@@ -227,17 +274,25 @@ const Loginstyles = StyleSheet.create({
     alignItems: 'center',
     marginBottom:20,
     width:200,
-    borderRadius:30,
+    // borderRadius:30,
   },
   fingerPrint: {
     height:45,
     marginBottom:20,
     width:50,
-    borderRadius:30,
+    // borderRadius:30,
     justifyContent: 'center',
   },
   loginButton: {
-    backgroundColor: "#3498db",
+    backgroundColor: "#3679B1",
+  },
+  logo:{
+    flex:1,
+  },
+  image:{
+    flex:1,
+    width:'100%',
+    marginTop:'10%',
   },
   loginText: {
     color: 'white',
