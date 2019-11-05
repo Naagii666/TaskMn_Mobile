@@ -6,6 +6,7 @@ import ReduxPersist from '../Config/ReduxPersist'
 import ProfileReducer from '../Containers/Profile/ProfileReducer'
 import ProjectsReducer from '../Containers/Projects/ProjectsReducer'
 import WorkersReducer from '../Containers/Workers/WorkersReducer'
+import AddProjectReducer from '../Containers/AddProject/AddReducer'
 /* ------------- Assemble The Reducers ------------- */
 export const reducers = combineReducers({
   nav: require('./NavigationRedux').reducer,
@@ -13,7 +14,8 @@ export const reducers = combineReducers({
   search: require('./SearchRedux').reducer,
   project: ProjectsReducer,
   profile: ProfileReducer,
-  workers: WorkersReducer
+  workers: WorkersReducer,
+  addProject: AddProjectReducer
 })
 
 export default () => {

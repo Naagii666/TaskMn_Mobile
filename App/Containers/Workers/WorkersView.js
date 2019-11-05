@@ -3,20 +3,42 @@ import {bindActionCreators} from 'redux'
 import React from 'react'
 import _ from 'lodash'
 import { fromJS } from "immutable";
-import { H3,View, Text, FlatList,ScrollView, RefreshControl,TouchableOpacity, TouchableHighlight ,Image,StyleSheet, 
-  StatusBar} from 'react-native'
-import { ListItem ,Rating, AirbnbRating } from 'react-native-elements'
+import { ActivityIndicator ,H3,View, Text, FlatList,ScrollView, RefreshControl,TouchableOpacity, TouchableHighlight ,Image,StyleSheet,BackHandler,StatusBar} from 'react-native'
+import { ListItem ,Rating, AirbnbRating,SearchBar } from 'react-native-elements'
+import { Avatar } from 'react-native-elements';
+import { Icon } from 'react-native-elements'
 import TouchableScale from 'react-native-touchable-scale';
 //import all the basic component we have used
 import { getAllWorkers } from './WorkersActions'
 
 
-class ProfileView extends React.Component {
+class WorkerView extends React.Component {
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      value:'',
+      error: null,
+      data: [],
+    };
+
+    this.arrayholder = [];
+  }
   componentDidMount() {
-	  this.props.getProfile()
+    const { workers, loading } = this.props
+    this.props.getProfile()
+    this.arrayholder = workers
+    this.setState({ data: workers }); 
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
 	}
-
+  componentWillUnmount() {
+		this.backHandler.remove()
+	  }
+	handleBackPress = () => {
+		BackHandler.exitApp()
+		return true;
+	}
 	_onRefresh() {
 		this.props.getProfile()
 	}
@@ -24,26 +46,101 @@ class ProfileView extends React.Component {
 	_renderEmpty() {
 		return <H3>Мэдэгдэл алга байна.</H3>
 	}
+  searchFilterFunction = text => {
+    this.setState({
+      value: text,
+    });
+    const newData = this.arrayholder.filter(item => {
+      const itemData = `${item.UserName.toUpperCase()} ${item.FirstName.toUpperCase()} ${item.LastName.toUpperCase()}`;
+      const textData = text.toUpperCase();
 
+      return itemData.indexOf(textData) > -1;
+    });
+    this.setState({
+      data: newData,
+    });
+  }
 	keyExtractor = (item, index) => index.toString()
 
+  navigateDetail(item){
+    this.props.navigation.navigate('WorkerDetail',{
+      item: item
+      })
+  }
+  renderHeader = () => {
+    return (
+      <SearchBar
+        placeholder="Хайх..."
+        lightTheme
+        round
+        onChangeText={text => this.searchFilterFunction(text)}
+        autoCorrect={false}
+        value={this.state.value}
+      />
+    );
+  };
+  
   renderItem = ({ item }) => (
-    
-    <ListItem style={item%2 == 0 ? { backgroundColor: "white", } : { backgroundColor: "#dcdcdc", }}
-      leftAvatar={{ source: { uri:'http://task.mn/content/'+item.ProPicture+'' } }}
-      title={item.FirstName+' '+item.LastName}
-      subtitle={item.Education}
+    <TouchableHighlight underlayColor={'#f2f2f2'}  
+      onPress={ () =>  this.navigateDetail(item)
+      }
+    >
+    <ListItem 
+      leftAvatar={item.ProPicture?{ source: { uri:'http://task.mn/content/'+item.ProPicture+'' } }:
+      {source : {uri: 'http://task.mn/Content/images/UserPictures/user2.png'}}}
+      title={<View style={{flexDirection:'column'}}>
+                <Text style={{color:'#3679B1',fontWeight:'bold'}}>{item.FirstName+' '+item.LastName}</Text>
+                <Text style={{color:'#3679B1'}}>({item.UserName})</Text>
+            </View>
+            }
+      subtitle={
+      <View style={{flex:1}}>
+        <Text style={{color:'black',fontStyle:'italic'}}>{item.Job}</Text> 
+      </View>
+      }
+      rightTitle={
+      <View style={{flex:1}}>
+        {item.FLRatings?(
+          <View style={{margin:5}}>
+        <Rating
+            imageSize={20}
+            readonly
+            style={{ flex:1 }}
+            startingValue={4.5}
+            // style={{ styles.rating }}
+          />
+          </View>
+        ):(
+          <View style={{margin:5}}>
+          <Rating
+            imageSize={15}
+            readonly
+            startingValue={4.5}
+            // style={{ styles.rating }}
+          />
+          <Text>(4.5)</Text>
+          </View>
+        )
+        }
+        
+    </View>
+    }
       bottomDivider
       chevron
     />
-   
+   </TouchableHighlight>
     
   )
  	render() {
     const { workers, loading } = this.props
+    
     return (
       <ScrollView>
         <View>
+        {	
+				    loading ? (
+                	<ActivityIndicator />
+            ) : (
           <FlatList
           	refreshControl={
               		<RefreshControl
@@ -52,9 +149,11 @@ class ProfileView extends React.Component {
               		/>
               	}
             keyExtractor={this.keyExtractor}
-            data={workers}
+            data={this.state.data}
             renderItem={this.renderItem}
+            ListHeaderComponent={this.renderHeader}
           />
+        )}
         </View>
       </ScrollView>
     )
@@ -72,7 +171,7 @@ export default connect(
      	getProfile: bindActionCreators(getAllWorkers, dispatch),
      }
    }
-)(ProfileView);
+)(WorkerView);
 
 const styles = StyleSheet.create({
   header:{

@@ -4,11 +4,12 @@ import LaunchScreen from '../Containers/LaunchScreen'
 import LoginScreen from '../Containers/Login/LoginScreen'
 import HomeScreen from '../Containers/Dashboard/HomeScreen'
 // import Profile from '../Containers/Dashboard/Profile'
-import AddProject from '../Containers/Dashboard/AddProject'
+import AddProject from '../Containers/AddProject/AddView'
 import MyProjects from '../Containers/Projects/ProjectsView'
 import ProjectDetail from '../Containers/Projects/ProjectDetail'
 import Profile from '../Containers/Profile/ProfileView'
 import Workers from '../Containers/Workers/WorkersView'
+import WorkerDetail from '../Containers/Workers/WorkerDetail'
 import styles from './Styles/NavigationStyles'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
@@ -90,12 +91,12 @@ const MyProjectsStack = createStackNavigator(
         backgroundColor: '#3679B1',
       },
       headerTintColor: '#FFFFFF',
-      title: 'Төслүүд',
+      title: 'Ажлууд',
       //Header title
     },
   }
 );
-const AddProjectSrack = createStackNavigator(
+const AddProjectStack = createStackNavigator(
   {
     //Defination of Navigaton from setting screen
     AddProject: { screen: AddProject },
@@ -108,12 +109,12 @@ const AddProjectSrack = createStackNavigator(
         backgroundColor: '#3679B1',
       },
       headerTintColor: '#FFFFFF',
-      title: 'Төсөл нэмэх',
+      title: 'Ажил оруулах',
       //Header title
     },
   }
 );
-const WorkersSrack = createStackNavigator(
+const WorkersStack = createStackNavigator(
   {
     //Defination of Navigaton from setting screen
     Workers: { screen: Workers },
@@ -126,11 +127,43 @@ const WorkersSrack = createStackNavigator(
         backgroundColor: '#3679B1',
       },
       headerTintColor: '#FFFFFF',
-      title: 'Харилцагчид',
+      title: 'Гүйцэтгэгчид',
       //Header title
     },
   }
 );
+const WorkerDetailStack = createStackNavigator(
+  {
+    //Defination of Navigaton from setting screen
+    WorkerDetail: { screen: WorkerDetail },
+  },
+  {
+    //For React Navigation 2.+ change defaultNavigationOptions->navigationOptions
+    defaultNavigationOptions: {
+      //Header customization of the perticular Screen
+      headerStyle: {
+        backgroundColor: '#3679B1',
+      },
+      headerTintColor: '#FFFFFF',
+      title: 'Дэлгэрэнгүй',
+      //Header title
+    },
+  }
+);
+const Details = createStackNavigator({
+  WorkerDetail: {
+    screen: WorkerDetail,
+    navigationOptions: {
+      header: null,
+    }
+   },
+   ProjectDetail: {
+    screen: ProjectDetail,
+    navigationOptions: {
+      header: null,
+    }
+   },
+})
 const Login = createStackNavigator({
   LaunchScreen: {
     screen: LaunchScreen,
@@ -141,17 +174,10 @@ const Login = createStackNavigator({
   ProjectDetail: {
     screen: ProjectDetail,
     navigationOptions: {
-      headerStyle: {
-        backgroundColor: '#3679B1',
-      },
-      headerTitle: 'Дэлгэрэнгүй',
-      headerLeft: (
-        this.Drawer.Tabs
-      ),
-      headerTintColor: '#FFFFFF',
-      //Header title
+      header: null,
     }
    },
+    
    LoginScreen: {
     screen: LoginScreen,
     navigationOptions: {
@@ -165,10 +191,11 @@ const Login = createStackNavigator({
 const App = createBottomTabNavigator(
   {
     Messenger: { screen: HomeStack },
-    Төслүүд: { screen: MyProjectsStack },
-    Нэмэх: {screen: AddProjectSrack},
-    Workers: {screen: WorkersSrack},
+    Ажлууд: { screen: MyProjectsStack},
+    Нэмэх: {screen: AddProjectStack},
+    Гүйцэтгэгчид: {screen: WorkersStack},
     Профайл: { screen: ProfileStack },
+    // WorkerDetail: { screen: WorkerDetailStack },
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
@@ -182,9 +209,9 @@ const App = createBottomTabNavigator(
           iconName = `ios-person`;
         } else if (routeName === 'Нэмэх') {
         	iconName = `ios-add-circle`;
-        } else if (routeName === 'Төслүүд') {
+        } else if (routeName === 'Ажлууд') {
         	iconName = `ios-briefcase`;
-        } else if (routeName === 'Workers') {
+        } else if (routeName === 'Гүйцэтгэгчид') {
           iconName = `ios-people`;
         }
         return <IconComponent name={iconName} size={25} color={tintColor} />;
@@ -198,6 +225,7 @@ const App = createBottomTabNavigator(
 );
 const Drawer = createDrawerNavigator({
   Stack:{screen:Login},
+  Stack2:{screen:Details},
   Tabs:{screen:App},
 },{
   edgeWidth:0

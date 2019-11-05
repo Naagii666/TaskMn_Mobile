@@ -9,7 +9,7 @@ export default class ProfileScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1, justifyContent: 'center',backgroundColor: '#DCDCDC', alignItems: 'center' }}>
-        <Text>AddProjects</Text>
+        <Text>Add    Project</Text>
       </View>
     );
   }

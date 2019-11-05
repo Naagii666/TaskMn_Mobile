@@ -1,0 +1,7 @@
+export const ADD_PROJECT = 'add_project'
+export const ADD_PROJECT_FAILED = 'ADD_PROJECT_FAILED'
+export const ADD_PROJECT_SUCCESS = 'ADD_PROJECT_SUCCESS'
+
+export const GET_PROJECT_TYPES = 'get_project_types'
+export const GET_PROJECT_TYPES_FAILED = 'GET_PROJECT_TYPES_FAILED'
+export const GET_PROJECT_TYPES_SUCCESS = 'GET_PROJECT_TYPES_SUCCESS'

@@ -3,6 +3,7 @@ package com.taskmn;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.imagepicker.ImagePickerPackage;
 import com.reactnativecomponent.splashscreen.RCTSplashScreenPackage;
 import com.smixx.reactnativeicons.ReactNativeIcons;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -18,6 +19,7 @@ import com.facebook.soloader.SoLoader;
 import com.reactnativecomponent.splashscreen.RCTSplashScreenPackage; 
 import java.util.Arrays;
 import java.util.List;
+import com.filepicker.FilePickerPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -31,6 +33,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ImagePickerPackage(),
             new RCTSplashScreenPackage(),
             new ReactNativeIcons(),
             new RNDeviceInfo(),
@@ -38,7 +41,8 @@ public class MainApplication extends Application implements ReactApplication {
             new AsyncStoragePackage(),
             new RNI18nPackage(),
             new VectorIconsPackage(),
-            new RNGestureHandlerPackage()
+            new RNGestureHandlerPackage(),
+            new FilePickerPackage()
             // new RCTSplashScreenPackage()
       );
     }

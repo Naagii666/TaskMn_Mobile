@@ -80,7 +80,7 @@ class LoginScreen extends Component {
     ///testing
     
     
-    let token = 'J50SKrwNDxpj5sXUkz46Hokn1EbwaeA8o1xbzbeKeg4spjKFRQiCGeJC3l3wNRMtlNdIPAWCrvnEppbRNw8vAmW4071dP8_I9m_a6SuVVD0YI8EV-NPohROUOR32DQtJI30SVqirRkfTuSR_Zn06A0yRAeTcwq-vvnT3B7xOtDnhxz_OqrwWGKuAE9emcgEgaz6sB2edvnnOm9OvohPr14qH6TYSckVWRf_32w2aNBzPa797A60JDUH-Y3XXuGXS';
+    let token = 'lMNobqmHISmATUzn0pZSeao4pr8C1ZqTuHvorarx-OQ4vgYUVXkjwA_FASMhf4ys007mRhFwMatcjv9cRqQjN9SM7Ik_LzowCVUWtsiUnJIyZgGR4fI1tuVXWJnbMyloxx2Zl5dl5L1u7JwM5cb5c376cJxPXN7Z6NSphqvxFis79yVftIe0ZbXMIDs4LdSEIYuuuElFm27HfCkhU2PbOXL5saRm66yY4OVvusHKYTxIRrm8NV-IQ2ExmSv5p3oP';
     setAuthenticationToken(token);
     let userData = {
            auth_token: token,
