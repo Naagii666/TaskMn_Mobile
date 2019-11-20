@@ -6,9 +6,12 @@ import { fromJS } from "immutable";
 import {ActivityIndicator, H3,View, Text, FlatList,ScrollView, RefreshControl,TouchableOpacity, TouchableHighlight ,Image,StyleSheet, StatusBar,BackHandler,Alert} from 'react-native'
 //import all the basic component we have used
 import Icon from 'react-native-vector-icons/FontAwesome'
+import { Header as Header2 } from 'react-navigation';
 import {  Card, ListItem, Button,Rating, AirbnbRating ,Avatar} from 'react-native-elements'
 import { getUserProjects } from '../Projects/ProjectsActions'
 import { getProfile } from './ProfileActions'
+import ViewMoreText from 'react-native-view-more-text';
+// import ViewMoreText from 'react-native-view-more-text';
 import {  
   deleteAuthenticationToken, 
 } from '../../Services/storage'
@@ -40,9 +43,11 @@ class ProfileView extends React.Component {
   }
   componentDidMount() {
     this.props.getProfile()
+    this.props.getUserProjects()
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     this.props.navigation.setParams({ 
       onLogout: this.onLogout,
+      EditProfile: this.EditProfile,
     });
     
   }
@@ -54,12 +59,15 @@ class ProfileView extends React.Component {
     }
   keyExtractor = (item, index) => index.toString();
 	handleBackPress = () => {
-		BackHandler.exitApp()
+		// BackHandler.exitApp()
 		return true;
 	}
 	_onRefresh() {
 		this.props.getProfile()
-	}
+  }
+  EditProfile = () =>{
+    this.props.navigation.navigate('EditProfile')
+  }
   onLogout = () => {
     Alert.alert(
       '',
@@ -72,11 +80,10 @@ class ProfileView extends React.Component {
         },
         {text: 'Тийм', onPress: () => {
           deleteAuthenticationToken(),
-          this.props.navigation.navigate('Stack',{
-          })
+          this.props.navigation.navigate('LoginScreen')
         }},
       ],
-      { cancelable: false },
+      { cancelable: true },
     );
     
   }
@@ -131,11 +138,26 @@ class ProfileView extends React.Component {
   renderProjects = ({item}) =>(
     // <View style={{marginVertical:20,marginHorizontal:10}}>
       <View style={styles.container}>
-        <Text style={styles.text}>{item.Name}</Text>
+        <TouchableOpacity style={{backgroundColor:'#eaeff5',marginVertical:5}}
+          onPress={() => {
+            this.props.navigation.navigate('WorkProgress')}}>
+          <Text style={[styles.text,{color:'#4285F4'}]}>{item.Name}</Text>
+        </TouchableOpacity>
+        
       </View>
     // </View>
     
   )
+  renderViewMore(onPress){
+    return(
+      <Text onPress={onPress} style={{color:'#727b84'}}>Дэлгэрэнгүй</Text>
+    )
+  }
+  renderViewLess(onPress){
+    return(
+      <Text onPress={onPress} style={{color:'#727b84'}}>Хураах</Text>
+    )
+  }
   renderItem = ({ item }) => (
     
     <View style={styles.container}>
@@ -170,6 +192,19 @@ class ProfileView extends React.Component {
                 <Text style={styles.userInfo}>{item.HomeAddress}</Text>
                 :null
                 }
+                {item.Description?
+                <ViewMoreText
+                  numberOfLines={3}
+                  renderViewMore={this.renderViewMore}
+                  renderViewLess={this.renderViewLess}
+                  textStyle={{textAlign: 'justify'}}
+                >
+                  <Text style={styles.userInfo}>
+                    {item.Description}
+                  </Text>
+                </ViewMoreText>
+                :null
+                }
                 
             </View>
           </View>
@@ -177,11 +212,11 @@ class ProfileView extends React.Component {
             <View style={{flex:1,flexDirection:'row', backgroundColor:'dcdcdc',marginVertical:20,marginHorizontal:10,alignContent:'center'}}>
 						  <TouchableHighlight underlayColor="#fff" style={this.state.isWorker?([styles.buttonContainer,styles.isActive]):([styles.buttonContainer])}
 							onPress={() => this.switchScreen(true)}>
-							  <Text style={{color:'#3679B1',marginBottom:2}}>Захиалагч</Text>
+							  <Text style={{color:'#4285F4',marginBottom:2}}>Захиалагч</Text>
 						  </TouchableHighlight>
 						  <TouchableHighlight underlayColor="#fff" style={this.state.isWorker?([styles.buttonContainer]):([styles.buttonContainer,styles.isActive])}
 							  onPress={() => this.switchScreen(false)}>
-							  <Text style={{color:'#3679B1',marginBottom:2}}>Гүйцэтгэгч</Text>
+							  <Text style={{color:'#4285F4',marginBottom:2}}>Гүйцэтгэгч</Text>
 						  </TouchableHighlight>	
 				    </View>
             {this.state.isWorker ? (
@@ -217,8 +252,8 @@ class ProfileView extends React.Component {
            	 	            renderItem={this.renderProjects}
           		          />
 				              )}
-            </View>
-          </View>
+                    </View>
+                  </View>
                 </View>
                 
               ):(
@@ -236,6 +271,25 @@ class ProfileView extends React.Component {
                     <Text style={styles.text}>Гүйцэтгэсэн ажлын тоо:</Text>
                     <Text style={styles.text}>Гүйцэтгэж байгаа ажлын тоо:</Text>
                     <Text style={styles.text}>Орлого: ₮</Text>
+                  </View>
+                  <View style={styles.body2}>
+                    <View style={{marginVertical:10}}>
+                      {this.state.loading2 ? (
+                        <ActivityIndicator />
+                      ) : (
+				                <FlatList
+          			          refreshControl={
+              		        <RefreshControl
+              			        refreshing={this.state.loading2}
+              			        onRefresh={this._onRefresh2.bind(this)}
+              		        />
+              	          }
+                        	keyExtractor={this.keyExtractor}
+            	            data={this.state.userProjects}
+           	 	            renderItem={this.renderProjects}
+          		          />
+				              )}
+                    </View>
                   </View>
                 </View>
               )  
@@ -257,9 +311,9 @@ class ProfileView extends React.Component {
          <View style={{ alignItems: 'flex-start' }}>
             <TouchableOpacity 
               activeOpacity={0.6}
-              onPress={navigation.getParam('onLogout')}
+              onPress={navigation.getParam('EditProfile')}
             >
-              <View style={{ margin:20, borderRadius: 5, paddingVertical: 10, paddingHorizontal: 20, backgroundColor: '#3679B1' }}>
+              <View style={{ margin:20, borderRadius: 5, paddingVertical: 10, paddingHorizontal: 20, backgroundColor: '#4285F4' }}>
                 <Icon name="cog" size={20} color="#FFF" />
               </View>
             </TouchableOpacity>
@@ -269,7 +323,7 @@ class ProfileView extends React.Component {
               activeOpacity={0.6}
               onPress={navigation.getParam('onLogout')}
             >
-              <View style={{ margin:20, borderRadius: 5, paddingVertical: 10, paddingHorizontal: 20, backgroundColor: '#3679B1' }}>
+              <View style={{ margin:20, borderRadius: 5, paddingVertical: 10, paddingHorizontal: 20, backgroundColor: '#4285F4' }}>
               <Icon name="sign-out" size={20} color="#FFF" />
               </View>
             </TouchableOpacity>
@@ -277,8 +331,8 @@ class ProfileView extends React.Component {
         </View>
       ),
       headerStyle:{
-        backgroundColor: '#3679B1',
-        height:80
+        backgroundColor: '#4285F4',
+        height:Header2.HEIGHT,
       },
       headerLeft: null,
       gesturesEnabled: false,
@@ -343,7 +397,7 @@ const styles = StyleSheet.create({
     height: 130,
     borderRadius: 63,
     borderWidth: 4,
-    borderColor: "#3679B1",
+    borderColor: "#4285F4",
     marginBottom:10,
   },
   name:{
@@ -369,7 +423,7 @@ const styles = StyleSheet.create({
     // height:500,
     // alignItems:'center',
     borderTopWidth:2,
-    borderTopColor:'#DB4437'
+    borderTopColor:'#727b84'
   },
   item:{
     flexDirection : 'row',
@@ -409,7 +463,7 @@ const styles = StyleSheet.create({
     marginBottom:20,
     width:250,
     borderRadius:30,
-    backgroundColor: "#3679B1",
+    backgroundColor: "#4285F4",
     
   },
   buttonContainer: {
@@ -423,10 +477,10 @@ const styles = StyleSheet.create({
 	marginHorizontal:'5%',
   },
   loginButton: {
-    backgroundColor: "#3679B1",
+    backgroundColor: "#4285F4",
   },
   isActive:{
-    borderBottomColor:'#3679B1',
+    borderBottomColor:'#4285F4',
     borderBottomWidth:3,
     }
 });

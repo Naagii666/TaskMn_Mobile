@@ -4,6 +4,7 @@ import { request, _getToken } from '../../utils/api'
 import { getAuthenticationToken } from '../../Services/storage'
 import { NavigationActions } from 'react-navigation'
 import { Alert } from 'react-native'
+import axios from 'axios'
 function* addProject({payload}) {
 	try {
 		// alert(payload.typeID)
@@ -17,14 +18,14 @@ function* addProject({payload}) {
 		formData.append('HighPrice', payload.highPrice)
 		formData.append('Duration', payload.duration)
 		let token = yield getAuthenticationToken()
-		let res = yield request(token).post(`api/project/AddProject`, formData)
-		
+		let res = yield request(token).post(`api/project/AddProject`,formData)
+
 		if(!res.data.success) {
 			return yield put({
 				type: types.ADD_PROJECT_FAILED
 			})
 		}
-
+		Alert.alert('Амжилттай','Ажил нэмэгдлээ')
 		yield put({
 			type: types.ADD_PROJECT_SUCCESS,
 			payload: res.data
@@ -42,6 +43,15 @@ function* addProject({payload}) {
 			type: types.ADD_PROJECT_FAILED
 		})
 	}
+	// axios.post('https://taskmobile-mo4.conveyor.cloud/api/project/AddProject',{
+	// 	Name: 'Fred',
+	//   })
+  	// 	.then(function (response) {
+    // 	console.log(response);
+  	// })
+  	// .catch(function (error) {
+    // 		console.log(error);
+  	// });
 	
 	
 }

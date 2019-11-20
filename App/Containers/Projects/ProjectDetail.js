@@ -3,25 +3,99 @@ import {bindActionCreators} from 'redux'
 import React from 'react'
 import _ from 'lodash'
 import { fromJS } from "immutable";
-import {Alert, Modal,ActivityIndicator,H3,View, Text, FlatList, RefreshControl, ScrollView,TouchableHighlight ,Image,StyleSheet, StatusBar, TouchableOpacity} from 'react-native'
+import {Alert, Modal,ActivityIndicator,H3,View, Text, FlatList, RefreshControl, ScrollView,TouchableHighlight ,Image,StyleSheet, StatusBar, TouchableOpacity,BackHandler,TextInput,Dimensions} from 'react-native'
 //import all the basic component we have used
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { Header as Header2 } from 'react-navigation';
 import moment from 'moment'
-import {  Card, ListItem, Button ,Header} from 'react-native-elements'
-
+import {  Card, ListItem, Button ,Header,Overlay } from 'react-native-elements'
+import { getAllWorkers } from '../Workers/WorkersActions'
+import { onBidProject,getBidListHire } from './ProjectsActions'
+import HTML from 'react-native-render-html';
 class ProjectDetail extends React.Component {
-  constructor(props) {
-    super(props);
+  
     state = {
 		  data:[],
+		  isVisible : false,
+		  bidView: false,
+		  userName:'',
+		  Price:'',
+		  Duration:'',
+		  Description:'',
+		  projectID:'',
 	};
-}
-componentDidMount() {
-  this.setState({data: this.props.navigation.getParam('item', []) });
-}
-  
-renderLeftComponent(){
+
+	componentDidMount() {
+		this.setState({data: this.props.navigation.getParam('item', []) });
+		this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+		this.props.getAllWorkers()
+	
+	}
+	_onRefresh() {
+		this.props.getBidListHire()
+	}
+	keyExtractor = (item, index) => index.toString();
+	BidProject(){
+		const item = this.props.navigation.getParam('item', []);
+		let error = this.formValidate()
+		if(error) return
+		this.setState({projectID:item.ID})
+		this.props.onBidProject(this.state)
+		this.setState({isVisible: false})
+	}
+	formValidate(){
+		let { Price ,Duration,Description } = this.state
+		if(!Price) {
+		Alert.alert('','Үнийн саналаа оруулна уу!')
+		return true
+		}
+		if(!Duration) {
+		Alert.alert('','Ажиллах хугацаагаа оруулна уу!')
+		return true
+		}
+	}
+	componentWillReceiveProps(){
+		this.findUser()
+	}
+	findUser(){
+		const workers = this.props.workers
+		const item = this.props.navigation.getParam('item', []);
+		var data = null
+		workers.forEach((worker) => {
+			if(worker.UserID === item.UserID) {
+				this.setState({userName: worker.UserName });
+				data = worker;
+		}
+	})
+	return data
+	}
+	findUserName(){
+		const workers = this.props.workers
+		const item = this.props.navigation.getParam('item', []);
+		var data = null
+		workers.forEach((worker) => {
+			if(worker.UserID === item.UserID) {
+				data = worker.UserName;
+		}
+	})
+	return data
+	}
+
+	componentWillUnmount() {
+		this.backHandler.remove()
+	}
+	handleBackPress = () => {
+		this.goBack(); // works best when the goBack is async
+		return true;
+	}
+	goBack(){
+		this.props.navigation.navigate('Tabs',{
+		})
+	}
+	bidClicked(){
+		this.setState({isVisible: true});
+	}
+	renderLeftComponent(){
 		return(
 			<View style={{flex:1}} >
 				<TouchableOpacity 
@@ -38,7 +112,34 @@ renderLeftComponent(){
 			</View>
 		)
 	}
-  
+	renderRightComponent(){
+		const isMyProjects = this.props.navigation.getParam('isMyProjects', 'true');
+		return(
+			
+			<View >
+				{
+				isMyProjects?
+						<TouchableOpacity style={[styles.bidButton]} 
+                  					onPress={() => this.bidClicked()}
+						>
+                  			<Text style={styles.bidText}>Санал өгөх</Text>
+                		</TouchableOpacity>
+				:
+						<TouchableOpacity style={[styles.bidButton]} 
+                  					// onPress={() => this._onLoginFunction()}
+						>
+                  			<Text style={styles.bidText}>Санал харах</Text>
+                		</TouchableOpacity>
+				}
+			</View>
+					
+		)
+	}
+	navigateDetail(item){
+		this.props.navigation.navigate('WorkerDetail',{
+		  item: item
+		  })
+	  }
 	renderSeparator = () => {
 		return (
 			<View
@@ -50,67 +151,208 @@ renderLeftComponent(){
 			/>
 		);
 	};
-  _onRefresh() {
-    // this.props.getAllProjects()
-  }
+	
 
-  _renderEmpty() {
-    return <H3>Мэдэгдэл алга байна.</H3>
-  }
-
+	_renderEmpty() {
+		return <H3>Мэдэгдэл алга байна.</H3>
+	}
+	renderItem = ({ item }) => (
+		<View>
+			{item.userName}
+		</View>
+	)
 
   render() {
 	const { navigation } = this.props;
+	const { workers, loading ,bid_list_hire,loading2} = this.props
 	const item = navigation.getParam('item', []);
 	const isMyProjects = navigation.getParam('isMyProjects', 'true');
+	const regex = /([&].*?[;])*(<.*?>)/ig;
     return (
-      <View>
+      <View style={{flex:1}}>
         <Header
+			containerStyle={{
+				height:Header2.HEIGHT,
+				backgroundColor: '#4285F4',
+			}}
+			leftComponent={this.renderLeftComponent()}
+			centerComponent={{ text: item.TypeName, style: { color: '#fff',flex:1,fontWeight:'bold',fontSize:18 } }}
+			// rightComponent={this.renderRightComponent()}
+		/>
+		
+				<ScrollView>
+					
+				<Overlay
+  					isVisible={this.state.isVisible}
+  					onBackdropPress={() => this.setState({ isVisible: false })}
+				>
+					<Header
 						containerStyle={{
 							height:Header2.HEIGHT,
-							backgroundColor: '#3679B1',
+							backgroundColor: '#4285F4',
 						}}
-						leftComponent={this.renderLeftComponent()}
-						centerComponent={{ text: item.TypeName, style: { color: '#fff',flex:1,fontWeight:'bold',fontSize:18 } }}
+						centerComponent={{ text: 'Ажлын санал', style: { color: '#fff',flex:1,fontWeight:'bold',fontSize:14 } }}
 					/>
-					<ScrollView>
+					<View style={{flexDirection:'row',alignSelf:'center'}}>
+						<Text style={{color:'#2D3954'}}>Ажлын саналын </Text>
+						<Text style={{color:'#ff5722'}}>форм</Text>
+					</View>
+					<View style={{marginTop:10}}>
+					<Text style={styles.formText}>
+						Ажлын хөлс/төгрөгөөр/
+					</Text>
+					<TextInput style={styles.inputs}
+                  		placeholder="100000 , 5000 ..."
+                  		keyboardType="numeric"
+                  		underlineColorAndroid='transparent'
+                  		onChangeText={(Price) => this.setState({Price})}
+					/>
+					<Text  style={styles.formText}>
+					Ажиллах хугацаа/хоногоор/
+					</Text>
 					
+					<TextInput style={styles.inputs}
+                  		placeholder="30"
+                  		keyboardType="numeric"
+                  		underlineColorAndroid='transparent'
+                  		onChangeText={(Duration) => this.setState({Duration})}
+					/>
+					<Text  style={styles.formText}>
+					Тайлбар
+					</Text>
+					
+					<TextInput style={styles.inputs}
+                  		placeholder="Давуу тал , тайлбар ..."
+                  		underlineColorAndroid='transparent'
+                  		onChangeText={(Description) => this.setState({Description})}
+					/>
+						
+					
+						<Text  style={styles.formText}>
+							Чадвар
+						</Text>
+						<View style={{flexDirection:'row',}}>
+							<TouchableOpacity style={[styles.comfirmButton,{alignContent:'center',
+														justifyContent: 'center',}]} 
+										onPress={() => this.BidProject()}
+										>
+										<Text style={{color:'#fff',justifyContent:'center',
+														textAlign:'center',}}>Батлах</Text>
+							</TouchableOpacity>
+							<TouchableOpacity style={[styles.closeButton,{alignContent:'center',
+														justifyContent: 'center',}]} 
+										onPress={() => this.setState({isVisible: false})}
+										>
+										<Text style={{color:'#fff',justifyContent:'center',
+														textAlign:'center',}}>Хаах</Text>
+							</TouchableOpacity>
+						</View>
+						
+					</View>
+					
+				</Overlay>
+				<Overlay
+  					isVisible={this.state.bidView}
+  					onBackdropPress={() => this.setState({ bidView: false })}
+				>
+					<Header
+						containerStyle={{
+							height:Header2.HEIGHT,
+							backgroundColor: '#4285F4',
+						}}
+						centerComponent={{ text: ' Санал өгсөн хэрэглэгчид', style: { color: '#fff',flex:1,fontWeight:'bold',fontSize:14 } }}
+					/>
+				<View>
+					<ScrollView>
+       				 {	
+						loading2 ? (
+							<ActivityIndicator />
+						) : (
+							<FlatList
+							refreshControl={
+								<RefreshControl
+								refreshing={loading2}
+								onRefresh={this._onRefresh.bind(this)}
+								/>
+							}
+							keyExtractor={this.keyExtractor}
+							data={bid_list_hire}
+							renderItem={this.renderItem}
+							/>
+						)
+					}
+					</ScrollView>
+					<View style={{flexDirection:'row',}}>
+							<TouchableOpacity style={[styles.comfirmButton,{alignContent:'center',
+														justifyContent: 'center',}]} 
+										// onPress={() => this.BidProject()}
+										>
+										<Text style={{color:'#fff',justifyContent:'center',
+														textAlign:'center',}}>Батлах</Text>
+							</TouchableOpacity>
+							<TouchableOpacity style={[styles.closeButton,{alignContent:'center',
+														justifyContent: 'center',}]} 
+										onPress={() => this.setState({bidView: false})}
+										>
+										<Text style={{color:'#fff',justifyContent:'center',
+														textAlign:'center',}}>Хаах</Text>
+							</TouchableOpacity>
+						</View>
+				</View>
+					
+					
+				</Overlay>
+
           			<View style={styles.container}>
             			<View>
-							{/* <Icon name={item.TypePictures} size={20} color="#3679B1"/> */}
+							{/* <Icon name={item.TypePictures} size={20} color="#4285F4"/> */}
 							<Text style={{textAlign:'left',color:'black',fontSize:20,fontWeight:'bold',flexDirection:'row'}}>		   	
 								{item.Name}
 							</Text>
 							<View style={{marginVertical:10}}>
-								<Text style={{color:'#3679B1'}}>
+								<Text style={{color:'#4285F4'}}>
 									Эхлэх хугацаа : <Text style={{color:'black'}} >{item.StartDate}</Text>
 								</Text>
-								<Text style={{color:'#3679B1'}}>
+								<Text style={{color:'#4285F4'}}>
 									Саналын тоо: <Text style={{color:'black'}} >{item.AllowBidNumber?item.AllowBidNumber:'0'}</Text>
 								</Text>
 							</View>
 							<View style={{marginVertical:10}}>
-								<Text style={{color:'black',fontSize:15,textAlign:'justify'}}>
-									{item.Description}
-								</Text>
+								<HTML html={item.Description} imagesMaxWidth={Dimensions.get('window').width} baseFontStyle={{color:'black'}}/>
+									{/* {item.Description.replace(regex, '')} */}
+								
 							</View>
 							{this.renderSeparator()}
 							<View style={{marginVertical:10}}>
-								<Text style={{color:'#3679B1',}}>Үнийн санал</Text>
+								<Text style={{color:'#4285F4',}}>Үнийн санал</Text>
 								<Text style={{fontSize:18,color:'black',marginTop:5,}}>
 									{item.LowPrice}₮-{item.HighPrice}₮
 								</Text>
 							</View>
+							{isMyProjects?
+								
+							<View>
 							{this.renderSeparator()}
-							<View style={{marginVertical:10}}>
-								<Text style={{color:'#3679B1',}}>Захиалагч</Text>
-								<Text style={{fontSize:18,color:'black',marginTop:5,}}>
-									{item.UserID}
-								</Text>
+								
+								<View style={{marginVertical:10}}>
+									<Text style={{color:'#4285F4',}}>Захиалагч</Text>
+									<TouchableOpacity 
+                  					 onPress={() => this.navigateDetail(this.findUser())}
+									  >
+                  						<Text style={{fontSize:18,color:'#3389ff',marginTop:5,}}>
+											{this.findUserName()}
+										</Text>
+                					</TouchableOpacity>
+									
+								</View>
 							</View>
+							:
+							null
+							
+							}
 							{this.renderSeparator()}
 							<View style={{marginVertical:10}}>
-								<Text style={{color:'#3679B1'}}>
+								<Text style={{color:'#4285F4'}}>
 									Шаардагдах ур чадварууд
 								</Text>
 								<View style={{justifyContent: 'flex-start',width:'auto'}}>
@@ -121,103 +363,112 @@ renderLeftComponent(){
 							</View>
 							{this.renderSeparator()}
 							<View style={{marginVertical:10}}>
-							<Text style={{color:'#3679B1'}}>
+							<Text style={{color:'#4285F4'}}>
 									Зураг 
 								</Text>
 							</View>
 							<View style={{marginVertical:30}}>
-							
-							</View>
-							
-							
-							  
-							  {/* <TouchableHighlight
-                				onPress={() => {
-                  				this.setModalVisible(!this.state.modalVisible,item);
-                				}}>
-                				<Text>Hide Modal</Text>
-							  </TouchableHighlight> */}
-							  
+							{/* <Image
+          						style={{width: 50, height: 50}}
+          						source={{uri: 'https://facebook.github.io/react-native/img/tiny_logo.png'}}
+        					/> */}
+							</View> 
             			</View>
-          				</View>
-						</ScrollView>
-			{
-				isMyProjects?
-					<View style={styles.constContainer}>
-						<TouchableOpacity style={[styles.bidButton]} 
-                  					// onPress={() => this._onLoginFunction()}
-						>
-                  			<Text style={styles.bidText}>Санал өгөх</Text>
-                		</TouchableOpacity>
-						<TouchableOpacity style={[styles.backButton]} 
-                  				onPress={() => {
+          			</View>
+				</ScrollView>
+				{
+							isMyProjects?
+							<View style={styles.constContainer}>
+								<TouchableOpacity style={[styles.backButton]} 
+                  					onPress={() => {
 										this.props.navigation.navigate('Tabs',{
 										})
-								}}
-						>
-                  			<Text style={styles.bidText}>Буцах</Text>
-                		</TouchableOpacity>
-					</View>
-				:
-					<View style={styles.constContainer}>
-						<TouchableOpacity style={[styles.bidButton]} 
-                  					// onPress={() => this._onLoginFunction()}
-						>
-                  			<Text style={styles.bidText}>Санал харах</Text>
-                		</TouchableOpacity>
-						<TouchableOpacity style={[styles.backButton]} 
-                  				onPress={() => {
+								  	}}
+									  >
+                  					<Text style={styles.bidText}>Буцах</Text>
+                				</TouchableOpacity>
+								<TouchableOpacity style={[styles.bidButton]} 
+                  					onPress={() => this.bidClicked()}
+									  >
+                  					<Text style={styles.bidText}>Санал өгөх</Text>
+                				</TouchableOpacity>
+								
+							</View>
+							:
+							<View style={styles.constContainer}>
+								<TouchableOpacity style={[styles.backButton]} 
+                  					onPress={() => {
 										this.props.navigation.navigate('Tabs',{
 										})
-								}}
-						>
-                  			<Text style={styles.bidText}>Буцах</Text>
-                		</TouchableOpacity>
-					</View>
-				}
+								  	}}
+									  >
+                  					<Text style={styles.bidText}>Буцах</Text>
+                				</TouchableOpacity>
+								<TouchableOpacity style={[styles.bidButton]} 
+                  					onPress={() => this.setState({bidView: true})}
+									  >
+                  					<Text style={styles.bidText}>Санал харах</Text>
+                				</TouchableOpacity>
+								
+							</View>
+						}
+			
         </View>
     )
   
   }
 }
-export default ProjectDetail;
+export default connect(
+	state => ({
+		loading: state.workers.getIn(['workers_list', 'loading']),
+		workers: state.workers.getIn(['workers_list', 'data']),
+		loading2: state.project.getIn(['bid_list_hire', 'loading']),
+		bid_list_hire: state.project.getIn(['bid_list_hire', 'data']),
+			   // projects: state.project.getIn(['project_list', 'data']).toJS(),
+	}),
+	dispatch => {
+	  return {
+		onBidProject: bindActionCreators(onBidProject, dispatch),
+		getAllWorkers: bindActionCreators(getAllWorkers, dispatch),
+	  }
+	}
+ )(ProjectDetail)
+// export default ProjectDetail
 
 const styles = StyleSheet.create({
-	thumb: {
-		width: 80,
-		height: 80,
-		marginRight: 10
-		},
-		textContainer: {
-		flex: 1
-		},
-		rowContainer: {
-		flexDirection: 'row',
-		padding: 10,
-		},
-		newsName: {
-		fontSize: 18,
-		// fontWeight: 'bold',
-		color: 'black'
-		},
-		title: {
-		fontSize: 14,
-		color: '#656565'
-	  },
+	formText:{
+		color:'#2D3954'
+	},
+	comfirmButton:{
+		backgroundColor:'#4285F4',
+		width:'40%',
+		height:40,
+		borderRadius:5,
+		alignSelf:'flex-start',
+		marginTop:50,
+		alignItems:'center',
+		marginHorizontal:'5%'
+	},
+	closeButton:{
+		backgroundColor:'#B3B3B3',
+		width:'40%',
+		height:40,
+		borderRadius:5,
+		alignSelf:'flex-end',
+		alignItems:'center',
+		marginHorizontal:'5%'
+	},
 	  container:{
 		margin:20
 	  },
-	  constContainer:{
-		left:0,
-		right:0,
-		bottom:0,
-		height:'10%',
-		backgroundColor:'#fff',
-		borderTopWidth:2,	
-		borderTopColor:'#dcdcdc',
-		flexDirection:'row',
-		alignSelf:'center'
+	  inputs:{
+		borderColor:'#4285F4',
+		borderWidth:1,
+		width:'90%',
+      	height:45,
+      	marginVertical:10,
 	  },
+	  
 	  buttonContainer: {
 		height:20,
 		flexDirection: 'row',
@@ -229,39 +480,53 @@ const styles = StyleSheet.create({
 		marginHorizontal:'5%',
 	  },
 	  bidButton:{
-		backgroundColor:'#3679B1',
+		backgroundColor:'#69d275',
+		// marginBottom:20,
 		alignContent:'center',
 		justifyContent: 'center',
-		width:'30%',
-		alignSelf:'flex-end',
-		marginRight:'10%',
-		borderRadius:10,
 		height:'70%',
-		marginVertical:10,
-		justifyContent:'center'
-	
+		width:'40%',
+		borderWidth:1,
+		borderColor:'#27b737',
+		borderRadius:10,
+		marginHorizontal:'5%',
+		marginVertical:5
 	  },
 	  backButton:{
 		backgroundColor:'#B3B3B3',
 		alignContent:'center',
 		justifyContent: 'center',
-		width:'30%',
-		alignSelf:'flex-start',
-		marginLeft:'10%',
+		width:'40%',
 		borderRadius:10,
 		height:'70%',
-		marginVertical:10,
-		justifyContent:'center'
+		borderWidth:1,
+		borderColor:'#B3B3B3',
+		marginHorizontal:'5%',
+		marginVertical:5
+	  },
+	  constContainer:{
+		left:0,
+		right:0,
+		bottom:0,
+		height:Header2.HEIGHT,
+		backgroundColor:'#fff',
+		borderTopWidth:2,	
+		borderTopColor:'#dcdcdc',
+		flexDirection:'row',
+		// alignSelf:'center'
+		position:'absolute',
+		flex:0.1,
 	  },
 	  bidText:{
 		color:'#fff',
 		// fontWeight:'bold',
-		fontSize:16,
+		fontSize:14,
 		justifyContent:'center',
-		textAlign:'center'
+		textAlign:'center',
+		flexDirection:'row'
 	  },
 	  isActive:{
-		borderBottomColor:'#3679B1',
+		borderBottomColor:'#4285F4',
 		borderBottomWidth:3,
 	  }
 });

@@ -1,7 +1,7 @@
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import React from 'react'
-import { View, Text, FlatList, RefreshControl,TouchableHighlight,StyleSheet,Alert,ScrollView, TextInput ,TouchableOpacity} from 'react-native'
+import { View, Text,Platform, FlatList, RefreshControl,TouchableHighlight,StyleSheet,Alert,ScrollView, TextInput ,TouchableOpacity,Button,BackHandler} from 'react-native'
 // import moment from 'moment'
 import { H2, H3, H4 } from '../../Components'
 import { addProject,getProjectTypes } from './AddActions'
@@ -10,9 +10,26 @@ import Icon from 'react-native-vector-icons/Entypo'
 import ModalSelector from 'react-native-modal-selector'
 import FilePickerManager from 'react-native-file-picker';
 import ImagePicker from 'react-native-image-picker'
+import DatePicker from 'react-native-datepicker';
+var date = new Date().getDate(); //Current Date
+var month = new Date().getMonth() + 1; //Current Month
+var year = new Date().getFullYear(); //Current Year
+var todayDate =  year+ '-' + month  + '-' +date  
+const initialState = {
+        name : '',
+        description   : '',
+        lowPrice: '',
+        highPrice: '',
+        loading: false,
+        photo: [],
+        typeID:'',
+        startDate:'',
+        duration:'',
+}
 class AddView extends React.Component {
 	constructor(props) {
       super(props);
+      // this.searchInput = React.createRef();
       state = {
         name : '',
         description   : '',
@@ -23,15 +40,26 @@ class AddView extends React.Component {
         typeID:'',
         startDate:'',
         duration:'',
+        // text:'',
       }
     }
   _alert(){
     Alert.alert('Мэдэгдэл', 'хийгдэж байна')
   }
   componentDidMount() {
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     this.props.getProjectTypes()
     this.setState({description:' '})
-	}
+    this.setState({startDate:todayDate})
+  }
+  componentWillUnmount(){
+    this.backHandler.remove()
+    this.setState(initialState);
+                this.forceUpdate()
+  }
+  // doClear() {
+  //   this.searchInput.current._root.clear();
+  // }
   // handleChoosePhoto = () => {
   //   const options = {
   //     noData: true,
@@ -54,6 +82,11 @@ class AddView extends React.Component {
   //     });
   //   }
   // };
+ 
+  handleBackPress = () => {
+		// this.goBack(); // works best when the goBack is async
+		return true;
+	}
   InsertProject = () => {
     // alert('Project added')
     let error = this.formValidate()
@@ -104,7 +137,7 @@ class AddView extends React.Component {
     
   // }
 	render() {
-    // const { photo } = this.state;
+    
     const { project, loading,types } = this.props
     let typeData = []
     if(this.props.types) {
@@ -124,7 +157,7 @@ class AddView extends React.Component {
       <ScrollView style={styles.container}>
         <View style={{ padding: 20, }}>
               <View style={{ marginBottom: 10, }}>
-                <Text style={{color:'#3679B1'}}>
+                <Text style={{color:'#4285F4'}}>
                   Категори: *
                 </Text>
               </View>
@@ -149,13 +182,15 @@ class AddView extends React.Component {
                 </View>  
               </View>
               <View style={{ marginBottom: 10, }}>
-                <Text style={{color:'#3679B1'}}>
+                <Text style={{color:'#4285F4'}}>
                   Гарчиг: *
                 </Text>
               </View>
               <View style={{alignContent:'center',marginHorizontal:10}}>
                 <View style={[styles.inputContainer, { flex: 1 }]}>
                     <TextInput 
+                        // ref={this.searchInput}
+                        // clearButtonMode='always'
                         style={styles.inputs}
                         keyboardType='default'
                         placeholder="Ажлын нэр"
@@ -166,7 +201,7 @@ class AddView extends React.Component {
                 </View>  
                 </View>
                 <View style={{ marginBottom: 10, }}>
-                <Text style={{color:'#3679B1'}}>
+                <Text style={{color:'#4285F4'}}>
                   Тайлбар:
                 </Text>
               </View>
@@ -183,7 +218,7 @@ class AddView extends React.Component {
                 </View>
                 </View>
                 <View style={{ marginBottom: 10, }}>
-                <Text style={{color:'#3679B1'}}>
+                <Text style={{color:'#4285F4'}}>
                     Ажлын хөлсний хэмжээ/төгрөгөөр/:
                 </Text>
               </View>
@@ -224,7 +259,7 @@ class AddView extends React.Component {
                 </View>
                 </View>
                 <View style={{ marginBottom: 10, }}>
-                <Text style={{color:'#3679B1'}}>
+                <Text style={{color:'#4285F4'}}>
                     Шаардагдах ур чадварууд:
                 </Text>
               </View>
@@ -244,7 +279,7 @@ class AddView extends React.Component {
 
             <View>
               <View style={{ marginBottom: 10, }}>
-                <Text style={{color:'#3679B1'}}>
+                <Text style={{color:'#4285F4'}}>
                   Үргэлжлэх хугацаа/зөвхөн хоног/:
                 </Text>
               </View>
@@ -267,23 +302,40 @@ class AddView extends React.Component {
               </View>
               <View>
               <View style={{ marginBottom: 10, }}>
-                <Text style={{color:'#3679B1'}}>
-                Санал авах сүүлийн хугацаа: *
+                <Text style={{color:'#4285F4'}}>
+                  Санал авах сүүлийн хугацаа: *
                 </Text>
               </View>
               <View style={{alignContent:'center',marginHorizontal:10}}>
-              <View style={[styles.inputContainer, { marginBottom: 0, }]}>
-                    <TextInput style={styles.inputs}
-                        placeholder=""
-                        keyboardType="numeric"
-                        // value={this.state.email}
-                        underlineColorAndroid='transparent'
-                        onChangeText={startDate => this.setState({ startDate })}
-                    />
+              <View style={[styles.inputContainer]}>
+                
+                <DatePicker
+                  style={{width: 200}}
+                  // date={this.state.startDate}
+                  mode="date"
+                  placeholder="Он сар сонгох"
+                  format="YYYY-MM-DD"
+                  minDate={todayDate}
+                  maxDate="2030-01-01"
+                  confirmBtnText="Сонгох"
+                  cancelBtnText="Буцах"
+                  customStyles={{
+                    dateIcon: {
+                      position: 'absolute',
+                      left: 0,
+                      top: 4,
+                      marginLeft: 0
+                    },
+                    dateInput: {
+                      marginLeft: 36
+                    }
+                  }}
+                  onDateChange={(date) => {this.setState({startDate: date})}}
+                />
               </View>
               </View>
               <View style={{ marginBottom: 10, }}>
-                <Text style={{color:'#3679B1'}}>
+                <Text style={{color:'#4285F4'}}>
                     Зураг:
                 </Text>
               </View>
@@ -299,7 +351,7 @@ class AddView extends React.Component {
                 activeOpacity={0.6}
                 // onPress={this.handleChoosePhoto}
                 >
-                <View style={[styles.inputContainer, { marginTop:10,marginBottom: 0, backgroundColor: '#f9ac19' }]}>
+                <View style={[styles.inputContainer, { marginTop:10,marginBottom: 0, backgroundColor: '#dcdcdc' }]}>
                     <View style={styles.inputs2}>
                         <Text>Зураг оруулах</Text>
                     </View>
@@ -323,6 +375,7 @@ class AddView extends React.Component {
       <TouchableOpacity style={[styles.backButton]} 
               onPress={() => {
                 this.props.navigation.navigate("Ажлууд")
+                
             }}
       >
           <Text style={styles.bidText}> Цуцлах</Text>
@@ -381,14 +434,14 @@ const styles = StyleSheet.create({
     inputContainer: {
         backgroundColor: '#FFFFFF',
         borderBottomWidth: 1,
-        borderBottomColor: "#3679B1",
+        borderBottomColor: "#4285F4",
         width:'90%',
         height:45,
         marginBottom:20,
         flexDirection: 'row',
         alignItems:'center',
         // paddingLeft:10,
-      //   shadowColor: "#3679B1",
+      //   shadowColor: "#4285F4",
       // shadowOffset: {
       //   width: 1,
       //   height: 2,
@@ -418,7 +471,7 @@ const styles = StyleSheet.create({
       width:250,
     },
     loginButton: {
-      backgroundColor: "#3679B1",
+      backgroundColor: "#4285F4",
     },
     loginText: {
       color: 'white',
@@ -458,7 +511,7 @@ const styles = StyleSheet.create({
         width:'100%',
         height:'10%',
         backgroundColor:'#fff',
-        borderTopWidth:2,	
+        borderTopWidth:1,	
         borderTopColor:'#DB4437',
         // flexDirection:'row',
         alignSelf:'center',

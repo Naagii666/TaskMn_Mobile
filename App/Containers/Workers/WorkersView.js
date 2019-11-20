@@ -20,27 +20,31 @@ class WorkerView extends React.Component {
     this.state = {
       value:'',
       error: null,
-      data: [],
+      data: this.props.workers,
     };
 
     this.arrayholder = [];
   }
   componentDidMount() {
     const { workers, loading } = this.props
-    this.props.getProfile()
+    this.props.getAllWorkers()
+    // this.props.getProfile()
     this.arrayholder = workers
     this.setState({ data: workers }); 
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
-	}
+  }
+  componentWillMount(){
+      this.props.getAllWorkers()
+  }
   componentWillUnmount() {
 		this.backHandler.remove()
 	  }
 	handleBackPress = () => {
-		BackHandler.exitApp()
+		// BackHandler.exitApp()
 		return true;
 	}
 	_onRefresh() {
-		this.props.getProfile()
+		this.props.getAllWorkers()
 	}
 
 	_renderEmpty() {
@@ -89,8 +93,8 @@ class WorkerView extends React.Component {
       leftAvatar={item.ProPicture?{ source: { uri:'http://task.mn/content/'+item.ProPicture+'' } }:
       {source : {uri: 'http://task.mn/Content/images/UserPictures/user2.png'}}}
       title={<View style={{flexDirection:'column'}}>
-                <Text style={{color:'#3679B1',fontWeight:'bold'}}>{item.FirstName+' '+item.LastName}</Text>
-                <Text style={{color:'#3679B1'}}>({item.UserName})</Text>
+                <Text style={{color:'#4285F4',fontWeight:'bold'}}>{item.FirstName+' '+item.LastName}</Text>
+                <Text style={{color:'#4285F4'}}>({item.UserName})</Text>
             </View>
             }
       subtitle={
@@ -168,7 +172,7 @@ export default connect(
    }),
    dispatch => {
      return {
-     	getProfile: bindActionCreators(getAllWorkers, dispatch),
+     	getAllWorkers: bindActionCreators(getAllWorkers, dispatch),
      }
    }
 )(WorkerView);

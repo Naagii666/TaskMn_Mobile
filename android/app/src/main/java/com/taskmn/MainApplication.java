@@ -1,6 +1,7 @@
 package com.taskmn;
 
 import android.app.Application;
+import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 
 import com.facebook.react.ReactApplication;
 import com.imagepicker.ImagePickerPackage;
@@ -42,11 +43,12 @@ public class MainApplication extends Application implements ReactApplication {
             new RNI18nPackage(),
             new VectorIconsPackage(),
             new RNGestureHandlerPackage(),
-            new FilePickerPackage()
+            new FilePickerPackage(),
+            new RNDateTimePickerPackage()
             // new RCTSplashScreenPackage()
       );
     }
-
+    
     @Override
     protected String getJSMainModuleName() {
       return "index";

@@ -3,6 +3,7 @@ import * as types from './ProjectsConstant'
 import { request, _getToken } from '../../utils/api'
 import { getAuthenticationToken } from '../../Services/storage'
 import { NavigationActions } from 'react-navigation'
+import { Alert } from 'react-native'
 function* getAllProjects() {
 	try {
 		let token = yield getAuthenticationToken()
@@ -48,16 +49,110 @@ function* getUserProjects() {
 	}
 }
 
+function* getBidListHire() {
+	try {
+		let token = yield getAuthenticationToken()
+		let res = yield request(token).get(`api/project/GetBidListHire`)
+		
+		if(res.data==null) {
+			return yield put({
+				type: types.GET_BID_LIST_HIRE_FAILED
+			})
+		}
+
+		return yield put({
+			type: types.GET_BID_LIST_HIRE_SUCCESS,
+			payload: res.data
+		})
+	} catch(e) {
+		alert(e.message)
+		yield put({
+			type: types.GET_BID_LIST_HIRE_FAILED
+		})
+	}
+}
+function* getBidListLancer() {
+	try {
+		let token = yield getAuthenticationToken()
+		let res = yield request(token).get(`api/project/GetBidListLancer`)
+		
+		if(res.data==null) {
+			return yield put({
+				type: types.GET_BID_LIST_LANCER_FAILED
+			})
+		}
+
+		return yield put({
+			type: types.GET_BID_LIST_LANCER_SUCCESS,
+			payload: res.data
+		})
+	} catch(e) {
+		alert(e.message)
+		yield put({
+			type: types.GET_BID_LIST_LANCER_FAILED
+		})
+	}
+}
+
+function* onBidProject({ payload }) {
+	try {
+		var formData = new FormData();
+		formData.append('Price', payload.Price)
+		formData.append('Duration', payload.Duration)
+		formData.append('Description', payload.Description)
+		formData.append('projectID', payload.projectID)
+		let token = yield getAuthenticationToken()
+		let res = yield request(token).post(`api/project/AddBid`,formData)
+
+		if(!res.data.success) {
+			
+			return yield put({
+				type: types.ON_BID_PROJECT_FAILED
+			})
+		}
+		Alert.alert('Амжилттай','Саналыг хүлээн авлаа')
+		this.props.navigation.navigate("Ажлууд")
+		yield put({
+			type: types.ON_BID_PROJECT_SUCCESS,
+			payload: res.data
+		})
+
+		yield put({
+			type: types.ON_BID_PROJECT
+		})
+
+		// yield put(NavigationActions.back())
+	} catch(e) {
+		alert(e.message)
+		//alert(e.message)
+		yield put({
+			type: types.ON_BID_PROJECT_FAILED
+		})
+	}
+}
+
 function* watchGetAllProjects() {
   yield takeEvery(types.GET_ALL_PROJECTS, getAllProjects)
 }
+function* watchGetBidListHire() {
+	yield takeEvery(types.GET_BID_LIST_HIRE, getBidListHire)
+}
+function* watchGetBidListLancer() {
+	yield takeEvery(types.GET_BID_LIST_LANCER, getBidListLancer)
+}
 function* watchGetUserProjects() {
 	yield takeEvery(types.GET_USER_PROJECTS, getUserProjects)
-  }
+}
+function* watchGetOnBidProject() {
+	yield takeEvery(types.ON_BID_PROJECT, onBidProject)
+}
 
 export default function *root() {
   yield all([
 	fork(watchGetAllProjects),
-	fork(watchGetUserProjects)
+	fork(watchGetUserProjects),
+	fork(watchGetOnBidProject),
+	fork(watchGetBidListHire),
+	fork(watchGetBidListLancer)
   ])
 }

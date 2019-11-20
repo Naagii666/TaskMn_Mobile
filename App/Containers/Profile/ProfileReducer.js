@@ -21,6 +21,7 @@ export default function ProfileReducer(state = InitialState, action) {
 			let { data } = action.payload
 			console.log(fromJS(action.payload))
 			console.log(action.payload)
+			// alert(action.payload.FLRatings)
 			return state.setIn(['profile_list', 'loading'], false)
 						.setIn(['profile_list', 'data'], action.payload)
 

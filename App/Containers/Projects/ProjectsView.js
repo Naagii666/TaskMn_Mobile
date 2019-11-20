@@ -3,7 +3,7 @@ import {bindActionCreators} from 'redux'
 import React from 'react'
 import _ from 'lodash'
 import { fromJS } from "immutable";
-import {Alert, Modal,ActivityIndicator,H3,View, Text, FlatList, RefreshControl, ScrollView,TouchableHighlight ,Image,StyleSheet, StatusBar, TouchableOpacity,BackHandler} from 'react-native'
+import {Alert, Modal,ActivityIndicator,H3,View, Text, FlatList, RefreshControl, ScrollView,TouchableHighlight ,Image,StyleSheet, StatusBar, TouchableOpacity,BackHandler,Dimensions} from 'react-native'
 //import all the basic component we have used
 import {  Card, ListItem, Button ,Header} from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome'
@@ -12,6 +12,7 @@ import moment from 'moment'
 import { getAllProjects,getUserProjects } from './ProjectsActions'
 import { Header as Header2 } from 'react-navigation';
 import { getAllWorkers } from '../Workers/WorkersActions'
+import HTML from 'react-native-render-html';
 const regex = /([&].*?[;])*(<.*?>)/ig;
 
 class ProjectsView extends React.Component {
@@ -37,7 +38,7 @@ class ProjectsView extends React.Component {
 		this.backHandler.remove()
 	  }
 	handleBackPress = () => {
-		this.goBack(); // works best when the goBack is async
+		// this.goBack(); // works best when the goBack is async
 		return true;
 	}
 	goBack(){
@@ -82,7 +83,7 @@ class ProjectsView extends React.Component {
 	renderItem = ({ item }) => (
 				<Card
 					  title={item.Name}
-					  style={{backgroundColor:'#3679B1'}}
+					  style={{backgroundColor:'#4285F4'}}
 					//   image={require('../images/pic2.jpg')}>
 				>
 					
@@ -96,16 +97,18 @@ class ProjectsView extends React.Component {
   					<Text numberOfLines={3} style={{marginBottom: 10,}}>
     					{item.Description.replace(regex,'')}
   					</Text>
+					  {/* <HTML html={item.Description} imagesMaxWidth={Dimensions.get('window').width} containerStyle={{numberOfLines:3}}/> */}
   					<Button
 						// icon={<Icon name='code' color='#ffffff' />}
-						onPress={() => this.setModalVisible(true,item)}
-						// onPress={() => {
-        				// 	this.props.navigation.navigate('ProjectDetail', {
-						// 		item:item,
-						// 		isMyProjects:this.state.isMyProjects
-						// 	})
-      					// }}
-    					buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0,backgroundColor:'#3679B1'}}
+						// onPress={() => this.setModalVisible(true,item)}
+						onPress={() => {
+        					this.props.navigation.navigate('ProjectDetail', {
+								item:item,
+								isMyProjects:this.state.isMyProjects,
+								
+							})
+      					}}
+    					buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0,backgroundColor:'#4285F4'}}
     					title='Дэлгэрэнгүй' />
 				</Card>
 	)
@@ -134,11 +137,11 @@ class ProjectsView extends React.Component {
 				<View style={{flex:1,flexDirection:'row', backgroundColor:'dcdcdc',marginVertical:20,marginHorizontal:10,alignContent:'center'}}>
 						<TouchableHighlight underlayColor="#fff" style={this.state.isMyProjects?([styles.buttonContainer,styles.isActive]):([styles.buttonContainer])}
 							onPress={() => this.switchScreen(true)}>
-							<Text style={{color:'#3679B1',marginBottom:2}}>Сүүлд нэмэгдсэн</Text>
+							<Text style={{color:'#4285F4',marginBottom:2}}>Сүүлд нэмэгдсэн</Text>
 						</TouchableHighlight>
 						<TouchableHighlight underlayColor="#fff" style={this.state.isMyProjects?([styles.buttonContainer]):([styles.buttonContainer,styles.isActive])}
 							onPress={() => this.switchScreen(false)}>
-							<Text style={{color:'#3679B1',marginBottom:2}}>Миний ажлууд</Text>
+							<Text style={{color:'#4285F4',marginBottom:2}}>Миний ажлууд</Text>
 						</TouchableHighlight>	
 				</View>
 
@@ -154,7 +157,7 @@ class ProjectsView extends React.Component {
 					<Header
 						containerStyle={{
 							height:Header2.HEIGHT,
-							backgroundColor: '#3679B1',
+							backgroundColor: '#4285F4',
 						}}
 						leftComponent={this.renderLeftComponent()}
 						centerComponent={{ text: this.state.data.TypeName, style: { color: '#fff',flex:1,fontWeight:'bold',fontSize:18 } }}
@@ -163,15 +166,15 @@ class ProjectsView extends React.Component {
 					
           			<View style={styles.container}>
             			<View>
-							{/* <Icon name={this.state.data.TypePictures} size={20} color="#3679B1"/> */}
+							{/* <Icon name={this.state.data.TypePictures} size={20} color="#4285F4"/> */}
 							<Text style={{textAlign:'left',color:'black',fontSize:20,fontWeight:'bold',flexDirection:'row'}}>		   	
 								{this.state.data.Name}
 							</Text>
 							<View style={{marginVertical:10}}>
-								<Text style={{color:'#3679B1'}}>
+								<Text style={{color:'#4285F4'}}>
 									Эхлэх хугацаа : <Text style={{color:'black'}} >{this.state.data.StartDate}</Text>
 								</Text>
-								<Text style={{color:'#3679B1'}}>
+								<Text style={{color:'#4285F4'}}>
 									Саналын тоо: <Text style={{color:'black'}} >{this.state.data.AllowBidNumber?this.state.data.AllowBidNumber:'0'}</Text>
 								</Text>
 							</View>
@@ -182,14 +185,14 @@ class ProjectsView extends React.Component {
 							</View>
 							{this.renderSeparator()}
 							<View style={{marginVertical:10}}>
-								<Text style={{color:'#3679B1',}}>Үнийн санал</Text>
+								<Text style={{color:'#4285F4',}}>Үнийн санал</Text>
 								<Text style={{fontSize:18,color:'black',marginTop:5,}}>
 									{this.state.data.LowPrice}₮-{this.state.data.HighPrice}₮
 								</Text>
 							</View>
 							{this.renderSeparator()}
 							<View style={{marginVertical:10}}>
-								<Text style={{color:'#3679B1',}}>Захиалагч</Text>
+								<Text style={{color:'#4285F4',}}>Захиалагч</Text>
 								<Text style={{fontSize:18,color:'black',marginTop:5,}}>
 									{this.state.workersData.forEach(worker =>{
 										if (worker.ID == this.state.data.UserID){
@@ -201,7 +204,7 @@ class ProjectsView extends React.Component {
 							</View>
 							{this.renderSeparator()}
 							<View style={{marginVertical:10}}>
-								<Text style={{color:'#3679B1'}}>
+								<Text style={{color:'#4285F4'}}>
 									Шаардагдах ур чадварууд
 								</Text>
 								<View style={{justifyContent: 'flex-start',width:'auto'}}>
@@ -212,7 +215,7 @@ class ProjectsView extends React.Component {
 							</View>
 							{this.renderSeparator()}
 							<View style={{marginVertical:10}}>
-							<Text style={{color:'#3679B1'}}>
+							<Text style={{color:'#4285F4'}}>
 									Зураг 
 								</Text>
 							</View>
@@ -379,7 +382,7 @@ const styles = StyleSheet.create({
 	marginHorizontal:'5%',
   },
   bidButton:{
-	backgroundColor:'#3679B1',
+	backgroundColor:'#4285F4',
 	alignContent:'center',
     justifyContent: 'center',
 	width:'30%',
@@ -411,7 +414,7 @@ const styles = StyleSheet.create({
 	textAlign:'center'
   },
   isActive:{
-	borderBottomColor:'#3679B1',
+	borderBottomColor:'#4285F4',
 	borderBottomWidth:3,
   }
 });

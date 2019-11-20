@@ -9,7 +9,8 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 import moment from 'moment'
 import { Header as Header2 } from 'react-navigation';
 import {  Card, ListItem, Button ,Header,Rating } from 'react-native-elements'
-
+import ViewMoreText from 'react-native-view-more-text';
+// npm install --save react-native-view-more-text 
 
 class WorkerDetail extends React.Component {
     state = {
@@ -47,20 +48,32 @@ class WorkerDetail extends React.Component {
 				</TouchableOpacity>
 			</View>
 		)
-	}
+  }
+  renderViewMore(onPress){
+    return(
+      <Text onPress={onPress} style={{color:'#727b84'}}>Дэлгэрэнгүй</Text>
+    )
+  }
+  renderViewLess(onPress){
+    return(
+      <Text onPress={onPress} style={{color:'#727b84'}}>Хураах</Text>
+    )
+  }
+  
   render() {
     const { navigation } = this.props;
     const item = navigation.getParam('item', 'User');
     return (
+      
         <View style={{marginBottom:60}}>
             <Header containerStyle={{
 							  height:Header2.HEIGHT,
-							  backgroundColor: '#3679B1',
+							  backgroundColor: '#4285F4',
 						  }}
 						  leftComponent={this.renderLeftComponent()}
 						  centerComponent={{ text:  item.UserName, style: { color: '#fff',fontWeight:'bold',fontSize:18, alignSelf:'center',marginVertical:'30%'} }}
 					  />
-
+          <ScrollView>
             <View style={styles.container}>
           <View style={styles.header}>
             <View style={styles.headerContent}>
@@ -93,6 +106,20 @@ class WorkerDetail extends React.Component {
                 <Text style={styles.userInfo}>{item.HomeAddress}</Text>
                 :null
                 }
+                {item.Description?
+                
+                <ViewMoreText
+                  numberOfLines={3}
+                  renderViewMore={this.renderViewMore}
+                  renderViewLess={this.renderViewLess}
+                  textStyle={{textAlign: 'justify'}}
+                >
+                  <Text style={styles.userInfo}>
+                    {item.Description}
+                  </Text>
+                </ViewMoreText>
+                :null
+                }
                 
             </View>
           </View>
@@ -100,11 +127,11 @@ class WorkerDetail extends React.Component {
             <View style={{flex:1,flexDirection:'row', backgroundColor:'dcdcdc',marginVertical:20,marginHorizontal:10,alignContent:'center'}}>
 						  <TouchableHighlight underlayColor="#fff" style={this.state.isWorker?([styles.buttonContainer,styles.isActive]):([styles.buttonContainer])}
 							onPress={() => this.switchScreen(true)}>
-							  <Text style={{color:'#3679B1',marginBottom:2}}>Гүйцэтгэгч</Text>
+							  <Text style={{color:'#4285F4',marginBottom:2}}>Гүйцэтгэгч</Text>
 						  </TouchableHighlight>
 						  <TouchableHighlight underlayColor="#fff" style={this.state.isWorker?([styles.buttonContainer]):([styles.buttonContainer,styles.isActive])}
 							  onPress={() => this.switchScreen(false)}>
-							  <Text style={{color:'#3679B1',marginBottom:2}}>Захиалагч</Text>
+							  <Text style={{color:'#4285F4',marginBottom:2}}>Захиалагч</Text>
 						  </TouchableHighlight>	
 				    </View>
             {this.state.isWorker ? (
@@ -146,6 +173,7 @@ class WorkerDetail extends React.Component {
 
           </View>
       </View>
+      </ScrollView>
         </View>
           
     )
@@ -172,7 +200,7 @@ const styles = StyleSheet.create({
     height: 130,
     borderRadius: 63,
     borderWidth: 4,
-    borderColor: "#3679B1",
+    borderColor: "#4285F4",
     marginBottom:10,
   },
   name:{
@@ -230,7 +258,7 @@ const styles = StyleSheet.create({
     marginBottom:20,
     width:250,
     borderRadius:30,
-    backgroundColor: "#3679B1",
+    backgroundColor: "#4285F4",
     
   },
   buttonContainer: {
@@ -244,10 +272,10 @@ const styles = StyleSheet.create({
 	marginHorizontal:'5%',
   },
   loginButton: {
-    backgroundColor: "#3679B1",
+    backgroundColor: "#4285F4",
   },
   isActive:{
-    borderBottomColor:'#3679B1',
+    borderBottomColor:'#4285F4',
     borderBottomWidth:3,
     }
 });

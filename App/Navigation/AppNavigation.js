@@ -2,12 +2,15 @@
 import { Button,View,TouchableOpacity,Text} from 'react-native'
 import LaunchScreen from '../Containers/LaunchScreen'
 import LoginScreen from '../Containers/Login/LoginScreen'
+import Register from '../Containers/Login/Register'
 import HomeScreen from '../Containers/Dashboard/HomeScreen'
 // import Profile from '../Containers/Dashboard/Profile'
 import AddProject from '../Containers/AddProject/AddView'
 import MyProjects from '../Containers/Projects/ProjectsView'
 import ProjectDetail from '../Containers/Projects/ProjectDetail'
 import Profile from '../Containers/Profile/ProfileView'
+import EditProfile from '../Containers/Profile/EditProfile'
+import WorkProgress from '../Containers/Profile/WorkProgress'
 import Workers from '../Containers/Workers/WorkersView'
 import WorkerDetail from '../Containers/Workers/WorkerDetail'
 import styles from './Styles/NavigationStyles'
@@ -50,7 +53,7 @@ const HomeStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#3679B1',
+        backgroundColor: '#4285F4',
       },
       headerTintColor: '#FFFFFF',
       title: 'Messenger',
@@ -69,7 +72,7 @@ const ProfileStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#3679B1',
+        backgroundColor: '#4285F4',
       },
       headerTintColor: '#FFFFFF',
       title: 'Профайл',
@@ -88,7 +91,7 @@ const MyProjectsStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#3679B1',
+        backgroundColor: '#4285F4',
       },
       headerTintColor: '#FFFFFF',
       title: 'Ажлууд',
@@ -106,7 +109,7 @@ const AddProjectStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#3679B1',
+        backgroundColor: '#4285F4',
       },
       headerTintColor: '#FFFFFF',
       title: 'Ажил оруулах',
@@ -124,7 +127,7 @@ const WorkersStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#3679B1',
+        backgroundColor: '#4285F4',
       },
       headerTintColor: '#FFFFFF',
       title: 'Гүйцэтгэгчид',
@@ -142,7 +145,7 @@ const WorkerDetailStack = createStackNavigator(
     defaultNavigationOptions: {
       //Header customization of the perticular Screen
       headerStyle: {
-        backgroundColor: '#3679B1',
+        backgroundColor: '#4285F4',
       },
       headerTintColor: '#FFFFFF',
       title: 'Дэлгэрэнгүй',
@@ -159,6 +162,18 @@ const Details = createStackNavigator({
    },
    ProjectDetail: {
     screen: ProjectDetail,
+    navigationOptions: {
+      header: null,
+    }
+   },
+   EditProfile: {
+    screen: EditProfile,
+    navigationOptions: {
+      header: null,
+    }
+   },
+   WorkProgress: {
+    screen: WorkProgress,
     navigationOptions: {
       header: null,
     }
@@ -180,6 +195,12 @@ const Login = createStackNavigator({
     
    LoginScreen: {
     screen: LoginScreen,
+    navigationOptions: {
+      header: null,
+    }
+   },
+   Register: {
+    screen: Register,
     navigationOptions: {
       header: null,
     }
@@ -218,7 +239,7 @@ const App = createBottomTabNavigator(
       },
     }),
     tabBarOptions: {
-      activeTintColor: '#3679B1',
+      activeTintColor: '#4285F4',
       inactiveTintColor: 'gray',
     },
   }

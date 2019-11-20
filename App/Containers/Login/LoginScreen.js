@@ -22,7 +22,7 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import _ from 'lodash'
 import SplashScreen from 'react-native-smart-splash-screen'
-import { setAuthenticationToken  } from '../../Services/storage'
+import { setAuthenticationToken,getAuthenticationToken  } from '../../Services/storage'
 //import PushNotification from 'react-native-push-notification';
 //import PushNotificationAndroid from 'react-native-push-notification'
 import { Images } from '../../Themes'
@@ -41,33 +41,30 @@ class LoginScreen extends Component {
   }
   componentDidMount () {
      //SplashScreen.close(SplashScreen.animationType.scale, 850, 500)
+     getAuthenticationToken()
+      .then(token => {
+          if(token) {
+            return this.props.navigation.navigate('Tabs',{
+            })
+          }
+      }) 
      SplashScreen.close({
         animationType: SplashScreen.animationType.scale,
         duration: 850,
         delay: 500,
      })
+     
+         
+    
   }
-  // _onLoginFunction = () => {
-  //   var form = new FormData();
-  //   form.append("email", this.state.email);
-  //   form.append("password", this.state.password);
-
-  //       this.setState({
-  //           isLoggedIn: true,
-  //         });
-  //       if(this.state.isLoggedIn) {
-  //           this.props.navigation.navigate('Tabs')
-  //       } 
-  // }
  _onLoginFunction = () => {
-    // alert('aaa');3
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
     var form = new FormData();
     form.append("UserName", this.state.email);
     form.append("Password", this.state.password);
     form.append("grant_type", 'password');
     const config = {
-      body: {
+      data: {
         "UserName": this.state.email,
         "Password": this.state.password,
         "grant_type": 'password'
@@ -76,30 +73,48 @@ class LoginScreen extends Component {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
     }
-
+    // var data = `grant_type=password&UserName=${this.state.email}&Password=${this.state.password}`
     ///testing
-    
-    
-    let token = 'lMNobqmHISmATUzn0pZSeao4pr8C1ZqTuHvorarx-OQ4vgYUVXkjwA_FASMhf4ys007mRhFwMatcjv9cRqQjN9SM7Ik_LzowCVUWtsiUnJIyZgGR4fI1tuVXWJnbMyloxx2Zl5dl5L1u7JwM5cb5c376cJxPXN7Z6NSphqvxFis79yVftIe0ZbXMIDs4LdSEIYuuuElFm27HfCkhU2PbOXL5saRm66yY4OVvusHKYTxIRrm8NV-IQ2ExmSv5p3oP';
-    setAuthenticationToken(token);
-    let userData = {
+    const data = `grant_type=password&UserName=${this.state.email}&Password=${this.state.password}`;   
+    axios.post('http://192.168.88.16:45455/token', data)
+     .then(response => {
+      //  alert(response)
+       if(response.data.access_token!=null) {
+        let token = response.data.access_token.toString();
+        // let token = "dh9j1vOLXdWXBDyTwYBJQsEk5gBE1QsT_knZygmu4IkE5uImcHABda6sleVvmDCvJweSgELI2eD0NzyCuWCxr2TEQAJhbkPvtVtcuY03qwouaJk16zS86wuB-Ya63Jwb6b28bKyYPay4yb0W9UhxfVuRuCXjfcGPbI67SzDBOKTJ4M0DK5J-jC3-W30tb2Hfr5hDSgBmqPzGExA4gkaajKJzUmzsIKb7VpYz2jYQce1CJgokhcos2J35eay-JoTh";
+        setAuthenticationToken(token);
+        let userData = {
            auth_token: token,
          }
          let appState = {
            isLoggedIn: true,
            userData: userData
          }
-    this.setState({
+        this.setState({
            isLoggedIn: appState.isLoggedIn,
            //user: appState.user
          });
+        
     if(this.state.isLoggedIn) {
            this.props.navigation.navigate('Tabs',{
            })
          }
-   // axios.post('https://taskmobile.conveyor.cloud/token',config)
-   //   .then(response => {
-   //     if(response.access_token!=null) {
+         else {
+          Alert.alert("Алдаа", "Хэрэглэгчийн мэйл/нууц үг буруу байна!");
+        }
+      }
+      else{
+        Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
+      }
+    }).catch(error => {
+        // alert(error.message)
+        Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
+        console.log(error);
+    });
+         
+  //  axios.post('https://taskmobile.conveyor.cloud/token',config)
+  //    .then(response => {
+  //      if(response.access_token!=null) {
    //       //console.log(JSON.stringify(response.data.data));
    //       let token = response.access_token.toString();
    //       //let customers_id = response.data.data.customers_id.toString();
@@ -132,17 +147,17 @@ class LoginScreen extends Component {
    //           //url: customers_picture,
    //           //name: customer_name
    //         })
-   //       } else {
-   //         Alert.alert("Алдаа", "Хэрэглэгчийн мэйл/нууц үг буруу байна!");
-   //       }
-   //     }
-   //     else{
-   //       Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
-   //     }
-   //   }).catch(error => {
-   //       alert(error.message)
-   //       console.log(error);
-   //   });
+    //      } else {
+    //        Alert.alert("Алдаа", "Хэрэглэгчийн мэйл/нууц үг буруу байна!");
+    //      }
+    //    }
+    //    else{
+    //      Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
+    //    }
+    //  }).catch(error => {
+    //      alert(error.message)
+    //      console.log(error);
+    //  });
   }
 render() {
     return (
@@ -152,7 +167,7 @@ render() {
             scrollEnabled={false}>
             <Image style={Loginstyles.logo} source={Images.logo_taskmn3} />
             <View>
-            <Text style={{color:'#3679B1',margin:'10%'}}><H2>Онлайн ажил/төслийн платформ</H2></Text> 
+            <Text style={{color:'#4285F4',margin:'10%'}}><H2>Онлайн ажил/төслийн платформ</H2></Text> 
             </View>
             <View style={Loginstyles.buttons}>
               <View style={Loginstyles.inputContainer}>
@@ -162,7 +177,7 @@ render() {
                   keyboardType="email-address"
                   underlineColorAndroid='transparent'
                   onChangeText={(email) => this.setState({email})}/>
-                  <Icon name="user" size={35} color="#3679B1" />
+                  <Icon name="user" size={35} color="#4285F4" />
               </View>
         
               <View style={Loginstyles.inputContainer}>
@@ -172,7 +187,7 @@ render() {
                   secureTextEntry={true}
                   underlineColorAndroid='transparent'
                   onChangeText={(password) => this.setState({password})}/>
-                  <Icon name="key" size={35} color="#3679B1"/>
+                  <Icon name="key" size={35} color="#4285F4"/>
               </View>
               <View style={Loginstyles.buttons}>
                 <TouchableOpacity style={[Loginstyles.buttonContainer, Loginstyles.loginButton]} 
@@ -180,13 +195,13 @@ render() {
                   <Text style={Loginstyles.loginText}>Нэвтрэх</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[Loginstyles.buttonContainer, Loginstyles.loginButton]} 
-                  onPress={() => this.props.navigation.navigate('Forgot_password')}>
+                  onPress={() => this.props.navigation.navigate('Register')}>
                   <Text style={Loginstyles.loginText}>Бүртгүүлэх</Text>
                 </TouchableOpacity>
               </View>
             </View>
             <TouchableOpacity  onPress={() => this.props.navigation.navigate('Register')}>
-              <Text>Нууц үг сэргээх</Text>
+              <Text style={{color:'#4285F4'}}>Нууц үг сэргээх</Text>
             </TouchableOpacity>
         </KeyboardAwareScrollView>
       </ScrollView>
@@ -284,7 +299,7 @@ const Loginstyles = StyleSheet.create({
     justifyContent: 'center',
   },
   loginButton: {
-    backgroundColor: "#3679B1",
+    backgroundColor: "#4285F4",
   },
   logo:{
     flex:1,
