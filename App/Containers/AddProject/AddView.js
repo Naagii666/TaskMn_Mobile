@@ -1,7 +1,7 @@
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import React from 'react'
-import { View, Text,Platform, FlatList, RefreshControl,TouchableHighlight,StyleSheet,Alert,ScrollView, TextInput ,TouchableOpacity,Button,BackHandler} from 'react-native'
+import { View, Text,Platform, FlatList, RefreshControl,TouchableHighlight,StyleSheet,Alert,ScrollView, TextInput ,TouchableOpacity,Button,BackHandler,Image} from 'react-native'
 // import moment from 'moment'
 import { H2, H3, H4 } from '../../Components'
 import { addProject,getProjectTypes } from './AddActions'
@@ -30,7 +30,7 @@ class AddView extends React.Component {
 	constructor(props) {
       super(props);
       // this.searchInput = React.createRef();
-      state = {
+      this.state = {
         name : '',
         description   : '',
         lowPrice: '',
@@ -57,38 +57,11 @@ class AddView extends React.Component {
     this.setState(initialState);
                 this.forceUpdate()
   }
-  // doClear() {
-  //   this.searchInput.current._root.clear();
-  // }
-  // handleChoosePhoto = () => {
-  //   const options = {
-  //     noData: true,
-  //   };
-  //   if(this.state.photo.length>2){
-  //     alert('Гурваас олон зураг оруулах боломжгүй')
-  //   }else{
-  //     ImagePicker.launchImageLibrary(options, response => {
-  //       if (response.didCancel) {
-  //         console.log('User cancelled image picker');
-  //       } else if (response.error) {
-  //         console.log('ImagePicker Error: ', response.error);
-  //       } else if (response.customButton) {
-  //         console.log('User tapped custom button: ', response.customButton);
-  //       } else {
-  //         const source = { uri: response.uri };
-  //         this.state.photo.push(response.uri)
-  //         this.forceUpdate()
-  //       }
-  //     });
-  //   }
-  // };
- 
   handleBackPress = () => {
 		// this.goBack(); // works best when the goBack is async
 		return true;
 	}
   InsertProject = () => {
-    // alert('Project added')
     let error = this.formValidate()
     if(error) return
     this.props.addProject(this.state)
@@ -109,36 +82,78 @@ class AddView extends React.Component {
     }
     
   }
-  // renderPhoto(){
-  //   if(this.state.photo!=null){
-  //     return(
-  //       this.state.photo.map((photo) => (
-  //         <View>
-  //             <Image source={{ uri: photo.uri }} 
-  //               style={{ width: 100, height: 100,marginVertical:10,marginHorizontal:5 }}/>
-  //             <TouchableOpacity 
-  //               activeOpacity={0.6}
-  //               onPress={()=>
-  //                 this.state.photo.map(elem =>{
-  //                   if(elem.uri==photo.uri){
-  //                     var index=this.state.photo.indexOf(elem);
-  //                     this.state.photo.splice(index,1);
-  //                     this.forceUpdate()
-  //                   }
-  //                 })
-  //               }>
-  //               <Icon2 style={{marginLeft:50}} name='trash-o' size={20} color='red' />  
-  //             </TouchableOpacity>
+  launchImageLibrary = () => {
+    let options = {
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+    };
+    ImagePicker.launchImageLibrary(options, (response) => {
+      console.log('Response = ', response);
+
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else if (response.customButton) {
+        console.log('User tapped custom button: ', response.customButton);
+        console.log(response.customButton);
+      } else {
+        const source = { uri: response.uri };
+        console.log('response', JSON.stringify(response));
+        let photo = this.state.photo
+        photo.push(response)
+        this.forceUpdate()
+      }
+    });
+
+  }
+  handleChoosePhoto = () => {
+    const options = {
+      title: 'Зураг оруулах',
+    };
+
+    ImagePicker.launchImageLibrary(options, (response) => {
+      if (response.uri) {
+        let photo = this.state.photo
+        photo.push(response)
+        this.forceUpdate()
+      }
+    });
+  };
+  renderPhoto(){
+    if(this.state.photo!=null){
+      return(
+        this.state.photo.map((photo) => (
+          <View>
+              
+              <TouchableOpacity 
+                activeOpacity={0.6}
+                onPress={()=>
+                  this.state.photo.map(elem =>{
+                    if(elem.uri==photo.uri){
+                      var index=this.state.photo.indexOf(elem);
+                      this.state.photo.splice(index,1);
+                      this.forceUpdate()
+                    }
+                  })
+                }>
+                <Icon style={{marginLeft:95,paddingTop:10}} name='circle-with-cross' size={20} color='red' />  
+              </TouchableOpacity>
+              <Image source={{ uri: photo.uri }} 
+                style={{ width: 100, height: 100,marginBottom:10,marginHorizontal:5 }}/>
           
-  //         </View>
-  //         ))
-  //     )
-  //   }
+          </View>
+          ))
+      )
+    }
     
-  // }
+  }
 	render() {
-    
+    const { photo } = this.state;
     const { project, loading,types } = this.props
+    let photos = this.renderPhoto()
     let typeData = []
     if(this.props.types) {
       this.props.types.forEach((type) => {
@@ -154,7 +169,7 @@ class AddView extends React.Component {
     
 		return (
       <View style={{marginBottom:60}}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={[styles.container,]}>
         <View style={{ padding: 20, }}>
               <View style={{ marginBottom: 10, }}>
                 <Text style={{color:'#4285F4'}}>
@@ -311,7 +326,7 @@ class AddView extends React.Component {
                 
                 <DatePicker
                   style={{width: 200}}
-                  // date={this.state.startDate}
+                  date={this.state.startDate}
                   mode="date"
                   placeholder="Он сар сонгох"
                   format="YYYY-MM-DD"
@@ -340,25 +355,16 @@ class AddView extends React.Component {
                 </Text>
               </View>
               <View style={{alignContent:'center',marginHorizontal:10}}>
-              <View style={[styles.inputContainer, { marginBottom: 0, }]}>
-              <View >
-      
-                {/* <View style={{ flex: 1,flexDirection: 'row',}}>
-                
-                    {photos}
-                </View> */}
-                <TouchableOpacity 
-                activeOpacity={0.6}
-                // onPress={this.handleChoosePhoto}
-                >
-                <View style={[styles.inputContainer, { marginTop:10,marginBottom: 0, backgroundColor: '#dcdcdc' }]}>
-                    <View style={styles.inputs2}>
-                        <Text>Зураг оруулах</Text>
-                    </View>
+                <View style={[styles.inputContainer, { marginBottom: 0, borderBottomColor: "#fff"}]}>
+                  <View >
+                    <TouchableOpacity onPress={this.launchImageLibrary} style={styles.btnSection}  >
+                      <Text style={styles.btnText}>Зураг оруулах</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </TouchableOpacity>
-              </View>
-              </View>
+                <View style={{flex:1,flexDirection: 'row',}}>
+                      {photos}
+                </View>
               </View>
             </View>
           </View>
@@ -371,11 +377,12 @@ class AddView extends React.Component {
             </TouchableOpacity>
 				</View> */}
       </ScrollView>
+
       <View style={styles.constContainer}>
       <TouchableOpacity style={[styles.backButton]} 
               onPress={() => {
-                this.props.navigation.navigate("Ажлууд")
-                
+                this.setState(initialState);
+                this.forceUpdate();
             }}
       >
           <Text style={styles.bidText}> Цуцлах</Text>
@@ -489,6 +496,23 @@ const styles = StyleSheet.create({
       justifyContent:'center',
       borderWidth:1,
       borderColor:'#27b737'
+      },
+      btnSection: {
+        width: 225,
+        height: 40,
+        backgroundColor: '#fff',
+        borderColor:'#4285F4',
+        borderWidth:1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 3,
+        marginVertical:10,
+        alignSelf:'center',
+      },
+      btnText: {
+        textAlign: 'center',
+        color: '#4285F4',
+        fontSize: 14,
       },
     backButton:{
       backgroundColor:'#f28787',

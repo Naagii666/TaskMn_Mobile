@@ -111,6 +111,7 @@ class LoginScreen extends Component {
         Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
         console.log(error);
     });
+    
          
   //  axios.post('https://taskmobile.conveyor.cloud/token',config)
   //    .then(response => {

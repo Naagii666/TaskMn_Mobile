@@ -213,7 +213,7 @@ const App = createBottomTabNavigator(
   {
     Messenger: { screen: HomeStack },
     Ажлууд: { screen: MyProjectsStack},
-    Нэмэх: {screen: AddProjectStack},
+    Захиалах: {screen: AddProjectStack},
     Гүйцэтгэгчид: {screen: WorkersStack},
     Профайл: { screen: ProfileStack },
     // WorkerDetail: { screen: WorkerDetailStack },
@@ -228,7 +228,7 @@ const App = createBottomTabNavigator(
           iconName = `ios-chatbubbles`;
         } else if (routeName === 'Профайл') {
           iconName = `ios-person`;
-        } else if (routeName === 'Нэмэх') {
+        } else if (routeName === 'Захиалах') {
         	iconName = `ios-add-circle`;
         } else if (routeName === 'Ажлууд') {
         	iconName = `ios-briefcase`;
