@@ -18,6 +18,9 @@ export const GET_BID_LIST_LANCER = 'GET_BID_LIST_LANCER'
 export const GET_BID_LIST_LANCER_FAILED = 'GET_BID_LIST_LANCER_FAILED'
 export const GET_BID_LIST_LANCER_SUCCESS = 'GET_BID_LIST_LANCER_SUCCESS'
 
+export const RELEASE_DATA = 'RELEASE_DATA'
+
+
 // "ID": "a527acd2-bda9-4347-9879-d4ac9c84e403",
 // "ProjectID": "c5cfda5f-d484-4c4f-a290-55eafdfbf877",
 // "LancerID": "c65e3ce3-29a7-4533-a006-e506995abaf9",

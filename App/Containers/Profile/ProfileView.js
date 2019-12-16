@@ -8,9 +8,10 @@ import {ActivityIndicator, H3,View, Text, FlatList,ScrollView, RefreshControl,To
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { Header as Header2 } from 'react-navigation';
 import {  Card, ListItem, Button,Rating, AirbnbRating ,Avatar} from 'react-native-elements'
-import { getUserProjects } from '../Projects/ProjectsActions'
+import { getUserProjects ,releaseData} from '../Projects/ProjectsActions'
 import { getProfile } from './ProfileActions'
 import ViewMoreText from 'react-native-view-more-text';
+import RNRestart from 'react-native-restart';
 // import ViewMoreText from 'react-native-view-more-text';
 import {  
   deleteAuthenticationToken, 
@@ -28,22 +29,29 @@ import {
 // }
 
 class ProfileView extends React.Component {
-  state = {
-    isWorker:true,
-    userProjects:[],
-    loading2:false,
-  };
+  constructor(props) {
+    super(props);
+      // this.searchInput = React.createRef();
+      this.state = {
+      isWorker:true,
+      userProjects:this.props.userProjects,
+      workingProjects:this.props.userProjects,
+      loading2:false,
+      userData:this.props.profile
+    };
+  }
   switchScreen(value){
 		this.setState({isWorker: value});
   }
-  componentWillMount(){
-    const { userProjects, loading2 } = this.props
-    this.setState({userProjects:userProjects})
-    this.setState({loading2:loading2})
+  componentWillUpdate(){
+    this.props.getUserProjects()
   }
   componentDidMount() {
+    const { profile,userProjects } = this.props
     this.props.getProfile()
     this.props.getUserProjects()
+    // this.setState({userData:profile[0]})
+    this.setState({userProjects:userProjects})
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     this.props.navigation.setParams({ 
       onLogout: this.onLogout,
@@ -66,7 +74,10 @@ class ProfileView extends React.Component {
 		this.props.getProfile()
   }
   EditProfile = () =>{
-    this.props.navigation.navigate('EditProfile')
+    const { profile} = this.props
+    this.props.navigation.navigate('EditProfile',{
+      user:this.props.profile[0]
+    })
   }
   onLogout = () => {
     Alert.alert(
@@ -80,7 +91,9 @@ class ProfileView extends React.Component {
         },
         {text: 'Тийм', onPress: () => {
           deleteAuthenticationToken(),
+          // releaseData(),
           this.props.navigation.navigate('LoginScreen')
+          RNRestart.Restart();
         }},
       ],
       { cancelable: true },
@@ -92,49 +105,6 @@ class ProfileView extends React.Component {
 	}
   keyExtractor = (item, index) => index.toString();
 
-// 	renderItem = ({ item }) => (
-//     <View style={styles.container}>
-          
-//       <View style={styles.header}>
-      
-//     {item.ProPicture?
-//     (
-//       <Image style={styles.avatar}  source={{uri:'http://task.mn/content/'+item.ProPicture+''}}/>
-//     ):(
-//       <Avatar size='xlarge' icon={{name: 'user', type: 'font-awesome', }} style={styles.avatar}/>
-//     )}
-//     </View>
-//     {/* <Image style={styles.avatar} source={{uri:ProPicture}}/> */}
-//     <View style={styles.body}>
-//       <View style={styles.bodyContent}>
-//           <Text style={styles.name}>{item.FirstName} {item.LastName}</Text>
-//           <Text style={styles.info}>{item.Job}</Text>
-//           <Rating
-//             imageSize={20}
-//             readonly
-//             startingValue={4}
-//             // style={{ styles.rating }}
-//           />
-//           <View style={styles.information}>
-//             <Text> {item.UserEmail} </Text>
-//             <Text> {item.PhoneNumber} </Text>
-//             <Text> {item.HomeAddress} </Text>
-//             <Text> {item.Education} </Text>
-//             </View>
-//           <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]}
-//           onPress={() => {
-//             this.props.navigation.navigate('Нэмэх')
-//           }}>
-//             <Text>Төсөл нэмэх</Text>  
-//           </TouchableOpacity>              
-//           <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]}>
-//             <Text>Засварлах</Text> 
-//           </TouchableOpacity>
-//       </View>
-//   </View>
-  
-// </View>
-// 	)
   renderProjects = ({item}) =>(
     // <View style={{marginVertical:20,marginHorizontal:10}}>
       <View style={styles.container}>
@@ -148,6 +118,11 @@ class ProfileView extends React.Component {
     // </View>
     
   )
+  EmptyComponent = ({ title }) => (
+		<View style={styles.emptyContainer}>
+		  <Text style={styles.emptyText}>{title}</Text>
+		</View>
+	  );
   renderViewMore(onPress){
     return(
       <Text onPress={onPress} style={{color:'#727b84'}}>Дэлгэрэнгүй</Text>
@@ -165,44 +140,64 @@ class ProfileView extends React.Component {
             <View style={styles.headerContent}>
                 
                   {item.ProPicture?
-                    <Image style={styles.avatar}
+                    <Image style={[styles.avatar,{alignSelf: 'center',}]}
                       source={{uri: 'http://task.mn/content/'+item.ProPicture+''}}/>
                       :
-                      <Image style={styles.avatar}
+                      <Image style={[styles.avatar,{alignSelf: 'center',}]}
                       source={{uri: 'http://task.mn/Content/images/UserPictures/user2.png'}}/>
                   }
-                <Text style={styles.name}>{item.FirstName} {item.LastName}</Text>
+                  <View style={{marginBottom:10}}>
+                    <Text style={[styles.name,{alignSelf: 'center',}]}>{item.FirstName} {item.LastName}</Text>
+                  </View>
                 {item.Job?
-                <Text style={styles.userInfo}>{item.Job}</Text>
+                  <View style={styles.infoView}>
+                      <Text style={styles.titleInfo}>Ажил :</Text>
+                      <Text style={styles.userInfo}>{item.Job}</Text>
+                  </View>
                 :null
                 }
                 {item.UserEmail?
-                <Text style={styles.userInfo}>{item.UserEmail}</Text>
+                  <View style={styles.infoView}>
+                    <Text style={styles.titleInfo}>Имэйл :</Text>
+                    <Text style={styles.userInfo}>{item.UserEmail}</Text>
+                  </View>
                 :null
                 }
                 {item.Education?
-                <Text style={styles.userInfo}>{item.Education}</Text>
+                  <View style={styles.infoView}>
+                    <Text style={styles.titleInfo}>Боловсрол :</Text>
+                    <Text style={styles.userInfo}>{item.Education}</Text>
+                  </View>
+                
                 :null
                 }
                 {item.PhoneNumber?
-                <Text style={styles.userInfo}>{item.PhoneNumber}</Text>
+                  <View style={styles.infoView}>
+                    <Text style={styles.titleInfo}>Утас :</Text>
+                    <Text style={styles.userInfo}>{item.PhoneNumber}</Text>
+                  </View>
                 :null
                 }
                 {item.HomeAddress?
-                <Text style={styles.userInfo}>{item.HomeAddress}</Text>
+                  <View style={styles.infoView}>
+                    <Text style={styles.titleInfo}>Гэрийн хаяг :</Text>
+                    <Text style={styles.userInfo}>{item.HomeAddress}</Text>
+                  </View>
                 :null
                 }
                 {item.Description?
-                <ViewMoreText
-                  numberOfLines={3}
-                  renderViewMore={this.renderViewMore}
-                  renderViewLess={this.renderViewLess}
-                  textStyle={{textAlign: 'justify'}}
-                >
-                  <Text style={styles.userInfo}>
-                    {item.Description}
-                  </Text>
-                </ViewMoreText>
+                  <View style={{marginTop:10}}>
+                    <ViewMoreText
+                      numberOfLines={3}
+                      renderViewMore={this.renderViewMore}
+                      renderViewLess={this.renderViewLess}
+                      textStyle={{textAlign: 'justify'}}
+                    >
+                      <Text style={styles.userInfo}>
+                        {item.Description}
+                      </Text>
+                    </ViewMoreText>
+                  </View>
                 :null
                 }
                 
@@ -249,7 +244,10 @@ class ProfileView extends React.Component {
               	          }
                         	keyExtractor={this.keyExtractor}
             	            data={this.state.userProjects}
-           	 	            renderItem={this.renderProjects}
+                            renderItem={this.renderProjects}
+                            ListEmptyComponent={
+                              <this.EmptyComponent title="Захиалсан ажил байхгүй байна." />
+                          }
           		          />
 				              )}
                     </View>
@@ -284,9 +282,12 @@ class ProfileView extends React.Component {
               			        onRefresh={this._onRefresh2.bind(this)}
               		        />
               	          }
-                        	keyExtractor={this.keyExtractor}
+                        	keyExtractor={this.state.userProjects.ID}
             	            data={this.state.userProjects}
-           	 	            renderItem={this.renderProjects}
+                          renderItem={this.renderProjects}
+                          ListEmptyComponent={
+                              <this.EmptyComponent title="Гүйцэтгэж байгаа ажил байхгүй байна." />
+                          }
           		          />
 				              )}
                     </View>
@@ -340,6 +341,7 @@ class ProfileView extends React.Component {
   }
  	render() {
     const { profile, loading } = this.props
+    
     return (
     	<ScrollView>
         {	
@@ -355,7 +357,7 @@ class ProfileView extends React.Component {
               }
             keyExtractor={this.keyExtractor}
             data={profile}
-              renderItem={this.renderItem}
+            renderItem={this.renderItem}
             />
           )}
       </ScrollView>
@@ -390,7 +392,7 @@ const styles = StyleSheet.create({
   },
   headerContent:{
     padding:30,
-    alignItems: 'center',
+    
   },
   avatar: {
     width: 130,
@@ -400,14 +402,28 @@ const styles = StyleSheet.create({
     borderColor: "#4285F4",
     marginBottom:10,
   },
+  emptyContainer:{
+    alignItems:'center'
+  },
   name:{
     fontSize:22,
     color:"#000000",
     fontWeight:'600',
   },
+  infoView:{
+    width:'70%',
+    alignSelf:'center',
+    flexDirection:'row', 
+    justifyContent:'space-between' 
+  },
   userInfo:{
     fontSize:14,
     color:"black",
+    fontWeight:'300',
+  },
+  titleInfo:{
+    fontSize:14,
+    color:"#4285F4",
     fontWeight:'300',
   },
   body:{

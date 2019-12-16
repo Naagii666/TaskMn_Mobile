@@ -11,6 +11,7 @@ import ModalSelector from 'react-native-modal-selector'
 import FilePickerManager from 'react-native-file-picker';
 import ImagePicker from 'react-native-image-picker'
 import DatePicker from 'react-native-datepicker';
+import RNRestart from 'react-native-restart';
 var date = new Date().getDate(); //Current Date
 var month = new Date().getMonth() + 1; //Current Month
 var year = new Date().getFullYear(); //Current Year

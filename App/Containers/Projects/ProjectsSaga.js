@@ -20,10 +20,12 @@ function* getAllProjects() {
 			payload: res.data
 		})
 	} catch(e) {
-		alert(e.message)
-		yield put({
-			type: types.GET_ALL_PROJECTS_FAILED
-		})
+			console.log(e.message)
+			// alert(e.message)
+			yield put({
+				type: types.GET_ALL_PROJECTS_FAILED
+			})
+		
 	}
 }
 function* getUserProjects() {
@@ -42,7 +44,8 @@ function* getUserProjects() {
 			payload: res.data
 		})
 	} catch(e) {
-		alert(e.message)
+		console.log(e.message)
+		// alert(e.message)
 		yield put({
 			type: types.GET_USER_PROJECTS_FAILED
 		})
@@ -95,23 +98,25 @@ function* getBidListLancer() {
 }
 
 function* onBidProject({ payload }) {
+	// alert(payload.projectID)
 	try {
 		var formData = new FormData();
 		formData.append('Price', payload.Price)
 		formData.append('Duration', payload.Duration)
+		formData.append('ProjectID', payload.projectID)
 		formData.append('Description', payload.Description)
-		formData.append('projectID', payload.projectID)
+		
 		let token = yield getAuthenticationToken()
 		let res = yield request(token).post(`api/project/AddBid`,formData)
 
-		if(!res.data.success) {
+		if(!res.data) {
 			
 			return yield put({
 				type: types.ON_BID_PROJECT_FAILED
 			})
 		}
 		Alert.alert('Амжилттай','Саналыг хүлээн авлаа')
-		this.props.navigation.navigate("Ажлууд")
+		// this.props.navigation.navigate("Ажлууд")
 		yield put({
 			type: types.ON_BID_PROJECT_SUCCESS,
 			payload: res.data
@@ -129,6 +134,16 @@ function* onBidProject({ payload }) {
 			type: types.ON_BID_PROJECT_FAILED
 		})
 	}
+}
+function* releaseData() {
+	alert('here')
+	yield put({
+		type: types.RELEASE_DATA,
+	})
+}
+
+function* watchReleaseData() {
+	yield takeEvery(types.RELEASE_DATA, releaseData)
 }
 
 function* watchGetAllProjects() {
@@ -153,6 +168,7 @@ export default function *root() {
 	fork(watchGetUserProjects),
 	fork(watchGetOnBidProject),
 	fork(watchGetBidListHire),
-	fork(watchGetBidListLancer)
+	fork(watchGetBidListLancer),
+	fork(watchReleaseData)
   ])
 }

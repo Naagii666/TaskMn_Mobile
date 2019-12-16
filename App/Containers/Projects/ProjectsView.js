@@ -17,7 +17,6 @@ const regex = /([&].*?[;])*(<.*?>)/ig;
 
 class ProjectsView extends React.Component {
 	state = {
-		modalVisible: false,
 		ID:"",
 		data:[],
 		isMyProjects:true,
@@ -29,7 +28,7 @@ class ProjectsView extends React.Component {
 		this.setState({data: item});
 	  }
   	componentDidMount() {
-	  this.props.getAllProjects()
+	//   this.props.getAllProjects()
 	  this.props.getUserProjects()
 	  this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
 	  this.setState({ workersData: this.props.workers }); 
@@ -102,16 +101,21 @@ class ProjectsView extends React.Component {
 						// icon={<Icon name='code' color='#ffffff' />}
 						// onPress={() => this.setModalVisible(true,item)}
 						onPress={() => {
+							// alert(item.ID)
         					this.props.navigation.navigate('ProjectDetail', {
 								item:item,
 								isMyProjects:this.state.isMyProjects,
-								
 							})
       					}}
     					buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0,backgroundColor:'#4285F4'}}
     					title='Дэлгэрэнгүй' />
 				</Card>
 	)
+	EmptyComponent = ({ title }) => (
+		<View style={styles.emptyContainer}>
+		  <Text style={styles.emptyText}>{title}</Text>
+		</View>
+	  );
 	renderLeftComponent(){
 		return(
 			<View style={{flex:1}} >
@@ -145,174 +149,56 @@ class ProjectsView extends React.Component {
 						</TouchableHighlight>	
 				</View>
 
-				<Modal
-					animationType="slide"
-          			transparent={false}
-					visible={this.state.modalVisible}
-					enum="formSheet"
-          			// onRequestClose={() => {
-            		// 	Alert.alert('Modal has been closed.');
-         			//  }}
-				>
-					<Header
-						containerStyle={{
-							height:Header2.HEIGHT,
-							backgroundColor: '#4285F4',
-						}}
-						leftComponent={this.renderLeftComponent()}
-						centerComponent={{ text: this.state.data.TypeName, style: { color: '#fff',flex:1,fontWeight:'bold',fontSize:18 } }}
-					/>
-					<ScrollView>
-					
-          			<View style={styles.container}>
-            			<View>
-							{/* <Icon name={this.state.data.TypePictures} size={20} color="#4285F4"/> */}
-							<Text style={{textAlign:'left',color:'black',fontSize:20,fontWeight:'bold',flexDirection:'row'}}>		   	
-								{this.state.data.Name}
-							</Text>
-							<View style={{marginVertical:10}}>
-								<Text style={{color:'#4285F4'}}>
-									Эхлэх хугацаа : <Text style={{color:'black'}} >{this.state.data.StartDate}</Text>
-								</Text>
-								<Text style={{color:'#4285F4'}}>
-									Саналын тоо: <Text style={{color:'black'}} >{this.state.data.AllowBidNumber?this.state.data.AllowBidNumber:'0'}</Text>
-								</Text>
-							</View>
-							<View style={{marginVertical:10}}>
-								<Text style={{color:'black',fontSize:15,textAlign:'justify'}}>
-									{this.state.data.Description}
-								</Text>
-							</View>
-							{this.renderSeparator()}
-							<View style={{marginVertical:10}}>
-								<Text style={{color:'#4285F4',}}>Үнийн санал</Text>
-								<Text style={{fontSize:18,color:'black',marginTop:5,}}>
-									{this.state.data.LowPrice}₮-{this.state.data.HighPrice}₮
-								</Text>
-							</View>
-							{this.renderSeparator()}
-							<View style={{marginVertical:10}}>
-								<Text style={{color:'#4285F4',}}>Захиалагч</Text>
-								<Text style={{fontSize:18,color:'black',marginTop:5,}}>
-									{this.state.workersData.forEach(worker =>{
-										if (worker.ID == this.state.data.UserID){
-											this.setState({worker:worker})
-										}
-									})}
-									{this.state.data.UserID}
-								</Text>
-							</View>
-							{this.renderSeparator()}
-							<View style={{marginVertical:10}}>
-								<Text style={{color:'#4285F4'}}>
-									Шаардагдах ур чадварууд
-								</Text>
-								<View style={{justifyContent: 'flex-start',width:'auto'}}>
-									<Text style={{marginTop:5,color:'black',flexDirection:'row',fontSize:15}}>		
-										{this.state.data.Skills}
-									</Text>
-								</View>
-							</View>
-							{this.renderSeparator()}
-							<View style={{marginVertical:10}}>
-							<Text style={{color:'#4285F4'}}>
-									Зураг 
-								</Text>
-							</View>
-							<View style={{marginVertical:30}}>
-							
-							</View>
-							
-							
-							  
-							  {/* <TouchableHighlight
-                				onPress={() => {
-                  				this.setModalVisible(!this.state.modalVisible,this.state.data);
-                				}}>
-                				<Text>Hide Modal</Text>
-							  </TouchableHighlight> */}
-							  
-            			</View>
-          				</View>
-						</ScrollView>
-						{
-							this.state.isMyProjects?
-							<View style={styles.constContainer}>
-								<TouchableOpacity style={[styles.bidButton]} 
-                  					// onPress={() => this._onLoginFunction()}
-									  >
-                  					<Text style={styles.bidText}>Санал өгөх</Text>
-                				</TouchableOpacity>
-								<TouchableOpacity style={[styles.backButton]} 
-                  					onPress={() => {
-										this.setModalVisible(!this.state.modalVisible,this.state.data);
-								  	}}
-									  >
-                  					<Text style={styles.bidText}>Буцах</Text>
-                				</TouchableOpacity>
-							</View>
-							:
-							<View style={styles.constContainer}>
-								<TouchableOpacity style={[styles.bidButton]} 
-                  					// onPress={() => this._onLoginFunction()}
-									  >
-                  					<Text style={styles.bidText}>Санал харах</Text>
-                				</TouchableOpacity>
-								<TouchableOpacity style={[styles.backButton]} 
-                  					onPress={() => {
-										this.setModalVisible(!this.state.modalVisible,this.state.data);
-								  	}}
-									  >
-                  					<Text style={styles.bidText}>Буцах</Text>
-                				</TouchableOpacity>
-							</View>
-						}
-						
-        			</Modal>
 				{this.state.isMyProjects ? (
 				
 				<View>
             	{	
-				loading ? (
-                	<ActivityIndicator />
-              	) : (
-				<FlatList
-          			refreshControl={
-              		<RefreshControl
-              			refreshing={loading}
-              			onRefresh={this._onRefresh.bind(this)}
-              		/>
-              	}
-            	keyExtractor={this.keyExtractor}
-            	data={projects}
-           	 	renderItem={this.renderItem}
-          		/>
-				)
-			}
-			</View>):(
-				<View>
-            	{	
-				loading2 ? (
-                	<ActivityIndicator />
-              	) : (
-				<FlatList
-          			refreshControl={
-              		<RefreshControl
-              			refreshing={loading}
-              			onRefresh={this._onRefresh2.bind(this)}
-              		/>
-              	}
-            	keyExtractor={this.keyExtractor}
-            	data={userProjects}
-           	 	renderItem={this.renderItem}
-          		/>
-				)
-			}
-			</View>
-
-			)
-		}
-			</View>
+					loading ? (
+						<ActivityIndicator />
+					) : (
+					<FlatList
+						refreshControl={
+						<RefreshControl
+							refreshing={loading}
+							onRefresh={this._onRefresh.bind(this)}
+						/>
+					}
+					keyExtractor={this.keyExtractor}
+					data={projects}
+					renderItem={this.renderItem}
+					ListEmptyComponent={
+						<this.EmptyComponent title="Ажил олдсонгүй" />
+					}
+					/>
+					)
+				}
+				</View>):(
+					<View>
+						{	
+						loading2 ? (
+							<ActivityIndicator />
+						) : (
+						<FlatList
+							refreshControl={
+							<RefreshControl
+								refreshing={loading}
+								onRefresh={this._onRefresh2.bind(this)}
+							/>
+						}
+						keyExtractor={this.keyExtractor}
+						data={userProjects}
+						renderItem={this.renderItem}
+						ListEmptyComponent={
+							<this.EmptyComponent title="Ажил олдсонгүй" />
+						}
+						
+						/>
+						)
+						}
+					</View>
+					)
+					}
+				</View>
 		)
 	}
 }
@@ -341,6 +227,10 @@ const styles = StyleSheet.create({
     height: 80,
     marginRight: 10
 	},
+	emptyContainer:{
+		alignItems:'center',
+		marginTop:10
+	  },
 	textContainer: {
     flex: 1
 	},

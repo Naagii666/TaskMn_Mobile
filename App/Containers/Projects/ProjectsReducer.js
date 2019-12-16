@@ -86,6 +86,12 @@ export default function ProjectsReducer(state = InitialState, action) {
 			// return state.setIn(['project_list', 'loading'], false)
 			// 			.setIn(['project_list', 'data'], fromJS(action.payload))
 		}
+		case types.RELEASE_DATA: {
+			return state.setIn(['project_list', 'data'],null)
+			.setIn(['user_projects', 'data'],null)
+			.setIn(['bid_project', 'data'],null)
+			.setIn(['bid_list_lancer', 'data'], null)
+		}
 		default:
 			return state
 	}

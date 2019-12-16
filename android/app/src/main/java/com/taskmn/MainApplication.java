@@ -4,6 +4,8 @@ import android.app.Application;
 import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 
 import com.facebook.react.ReactApplication;
+import com.avishayil.rnrestart.ReactNativeRestartPackage;
+// import com.reactcommunity.rndatetimepicker.RNDateTimePickerPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.reactnativecomponent.splashscreen.RCTSplashScreenPackage;
 import com.smixx.reactnativeicons.ReactNativeIcons;
@@ -34,6 +36,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativeRestartPackage(),
+            // new RNDateTimePickerPackage(),
             new ImagePickerPackage(),
             new RCTSplashScreenPackage(),
             new ReactNativeIcons(),

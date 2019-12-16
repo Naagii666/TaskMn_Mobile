@@ -68,6 +68,8 @@
 		0F59B9D2365F492EBF7D0AD2 /* libReactNativeIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B4CDBE43796A45C7B537921E /* libReactNativeIcons.a */; };
 		829380AD301D4D17B67CA7CB /* libRCTSplashScreen.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E7A97CA2ECBB48F588AFB8E7 /* libRCTSplashScreen.a */; };
 		BC0144574F094398A9EE2C19 /* libRNImagePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E7B1909AF1594D96B3D0A80F /* libRNImagePicker.a */; };
+		A93BBD40DD8843F9BFDF0304 /* libRNDateTimePicker.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 38B9A5B54F6C48E9BE4F50D2 /* libRNDateTimePicker.a */; };
+		4771569CCEF347B4B320858D /* libRCTRestart.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0A44E939817D4EDBA5214C59 /* libRCTRestart.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -413,6 +415,10 @@
 		E7A97CA2ECBB48F588AFB8E7 /* libRCTSplashScreen.a */ = {isa = PBXFileReference; name = "libRCTSplashScreen.a"; path = "libRCTSplashScreen.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		A75E094CDF084E7BABBFF2B7 /* RNImagePicker.xcodeproj */ = {isa = PBXFileReference; name = "RNImagePicker.xcodeproj"; path = "../node_modules/react-native-image-picker/ios/RNImagePicker.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		E7B1909AF1594D96B3D0A80F /* libRNImagePicker.a */ = {isa = PBXFileReference; name = "libRNImagePicker.a"; path = "libRNImagePicker.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		95B7B3DE1A9D4513BE932C0E /* RNDateTimePicker.xcodeproj */ = {isa = PBXFileReference; name = "RNDateTimePicker.xcodeproj"; path = "../node_modules/@react-native-community/datetimepicker/ios/RNDateTimePicker.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		38B9A5B54F6C48E9BE4F50D2 /* libRNDateTimePicker.a */ = {isa = PBXFileReference; name = "libRNDateTimePicker.a"; path = "libRNDateTimePicker.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		458C24FA5E774D1FB2CF2304 /* RCTRestart.xcodeproj */ = {isa = PBXFileReference; name = "RCTRestart.xcodeproj"; path = "../node_modules/react-native-restart/ios/RCTRestart.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		0A44E939817D4EDBA5214C59 /* libRCTRestart.a */ = {isa = PBXFileReference; name = "libRCTRestart.a"; path = "libRCTRestart.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -450,6 +456,8 @@
 				0F59B9D2365F492EBF7D0AD2 /* libReactNativeIcons.a in Frameworks */,
 				829380AD301D4D17B67CA7CB /* libRCTSplashScreen.a in Frameworks */,
 				BC0144574F094398A9EE2C19 /* libRNImagePicker.a in Frameworks */,
+				A93BBD40DD8843F9BFDF0304 /* libRNDateTimePicker.a in Frameworks */,
+				4771569CCEF347B4B320858D /* libRCTRestart.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -653,6 +661,8 @@
 				A77647B77F1E4715B7205CCA /* ReactNativeIcons.xcodeproj */,
 				C63A57B13ACA4F21AA544799 /* RCTSplashScreen.xcodeproj */,
 				A75E094CDF084E7BABBFF2B7 /* RNImagePicker.xcodeproj */,
+				95B7B3DE1A9D4513BE932C0E /* RNDateTimePicker.xcodeproj */,
+				458C24FA5E774D1FB2CF2304 /* RCTRestart.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1333,6 +1343,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1345,6 +1357,8 @@
 					"$(SRCROOT)\..\node_modules\react-native-icons\ios\ReactNativeIcons/**",
 					"$(SRCROOT)\..\node_modules\react-native-smart-splash-screen\ios\RCTSplashScreen\RCTSplashScreen",
 					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
+					"$(SRCROOT)\..\node_modules\@react-native-community\datetimepicker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-restart\ios\RCTRestart",
 				);
 			};
 			name = Debug;
@@ -1380,6 +1394,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1392,6 +1408,8 @@
 					"$(SRCROOT)\..\node_modules\react-native-icons\ios\ReactNativeIcons/**",
 					"$(SRCROOT)\..\node_modules\react-native-smart-splash-screen\ios\RCTSplashScreen\RCTSplashScreen",
 					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
+					"$(SRCROOT)\..\node_modules\@react-native-community\datetimepicker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-restart\ios\RCTRestart",
 				);
 			};
 			name = Release;
@@ -1423,6 +1441,8 @@
 					"$(SRCROOT)\..\node_modules\react-native-icons\ios\ReactNativeIcons/**",
 					"$(SRCROOT)\..\node_modules\react-native-smart-splash-screen\ios\RCTSplashScreen\RCTSplashScreen",
 					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
+					"$(SRCROOT)\..\node_modules\@react-native-community\datetimepicker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-restart\ios\RCTRestart",
 				);
 			};
 			name = Debug;
@@ -1453,6 +1473,8 @@
 					"$(SRCROOT)\..\node_modules\react-native-icons\ios\ReactNativeIcons/**",
 					"$(SRCROOT)\..\node_modules\react-native-smart-splash-screen\ios\RCTSplashScreen\RCTSplashScreen",
 					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
+					"$(SRCROOT)\..\node_modules\@react-native-community\datetimepicker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-restart\ios\RCTRestart",
 				);
 			};
 			name = Release;
@@ -1496,6 +1518,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1508,6 +1532,8 @@
 					"$(SRCROOT)\..\node_modules\react-native-icons\ios\ReactNativeIcons/**",
 					"$(SRCROOT)\..\node_modules\react-native-smart-splash-screen\ios\RCTSplashScreen\RCTSplashScreen",
 					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
+					"$(SRCROOT)\..\node_modules\@react-native-community\datetimepicker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-restart\ios\RCTRestart",
 				);
 			};
 			name = Debug;
@@ -1551,6 +1577,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1563,6 +1591,8 @@
 					"$(SRCROOT)\..\node_modules\react-native-icons\ios\ReactNativeIcons/**",
 					"$(SRCROOT)\..\node_modules\react-native-smart-splash-screen\ios\RCTSplashScreen\RCTSplashScreen",
 					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
+					"$(SRCROOT)\..\node_modules\@react-native-community\datetimepicker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-restart\ios\RCTRestart",
 				);
 			};
 			name = Release;
@@ -1605,6 +1635,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1617,6 +1649,8 @@
 					"$(SRCROOT)\..\node_modules\react-native-icons\ios\ReactNativeIcons/**",
 					"$(SRCROOT)\..\node_modules\react-native-smart-splash-screen\ios\RCTSplashScreen\RCTSplashScreen",
 					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
+					"$(SRCROOT)\..\node_modules\@react-native-community\datetimepicker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-restart\ios\RCTRestart",
 				);
 			};
 			name = Debug;
@@ -1659,6 +1693,8 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1671,6 +1707,8 @@
 					"$(SRCROOT)\..\node_modules\react-native-icons\ios\ReactNativeIcons/**",
 					"$(SRCROOT)\..\node_modules\react-native-smart-splash-screen\ios\RCTSplashScreen\RCTSplashScreen",
 					"$(SRCROOT)\..\node_modules\react-native-image-picker\ios",
+					"$(SRCROOT)\..\node_modules\@react-native-community\datetimepicker\ios/**",
+					"$(SRCROOT)\..\node_modules\react-native-restart\ios\RCTRestart",
 				);
 			};
 			name = Release;

@@ -20,7 +20,7 @@ class WorkerView extends React.Component {
     this.state = {
       value:'',
       error: null,
-      data: this.props.workers,
+      data: [],
     };
 
     this.arrayholder = [];
@@ -28,23 +28,23 @@ class WorkerView extends React.Component {
   componentDidMount() {
     const { workers, loading } = this.props
     this.props.getAllWorkers()
-    // this.props.getProfile()
     this.arrayholder = workers
     this.setState({ data: workers }); 
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
   }
   componentWillMount(){
-      this.props.getAllWorkers()
+    this.setState({ data:  this.props.workers });
   }
   componentWillUnmount() {
 		this.backHandler.remove()
-	  }
+	}
 	handleBackPress = () => {
 		// BackHandler.exitApp()
 		return true;
 	}
 	_onRefresh() {
-		this.props.getAllWorkers()
+    this.props.getAllWorkers()
+    // this.setState({ data: this.props.getAllWorkers() });
 	}
 
 	_renderEmpty() {
@@ -57,20 +57,25 @@ class WorkerView extends React.Component {
     const newData = this.arrayholder.filter(item => {
       const itemData = `${item.UserName.toUpperCase()} ${item.FirstName.toUpperCase()} ${item.LastName.toUpperCase()}`;
       const textData = text.toUpperCase();
-
       return itemData.indexOf(textData) > -1;
     });
     this.setState({
       data: newData,
     });
   }
-	keyExtractor = (item, index) => index.toString()
+  keyExtractor = (item, index) => index.toString()
+  _keyExtractor = (item, index) => item.UserID;
 
   navigateDetail(item){
     this.props.navigation.navigate('WorkerDetail',{
       item: item
       })
   }
+  EmptyComponent = ({ title }) => (
+		<View style={styles.emptyContainer}>
+		  <Text style={styles.emptyText}>{title}</Text>
+		</View>
+	  );
   renderHeader = () => {
     return (
       <SearchBar
@@ -83,7 +88,9 @@ class WorkerView extends React.Component {
       />
     );
   };
-  
+  _renderEmpty() {
+    return <H3>Мэдээлэл олдсонгүй</H3>
+  }
   renderItem = ({ item }) => (
     <TouchableHighlight underlayColor={'#f2f2f2'}  
       onPress={ () =>  this.navigateDetail(item)
@@ -151,8 +158,11 @@ class WorkerView extends React.Component {
               			refreshing={loading}
               			onRefresh={this._onRefresh.bind(this)}
               		/>
-              	}
-            keyExtractor={this.keyExtractor}
+                }
+            ListEmptyComponent={
+                  <this.EmptyComponent title="Хайлт олдсонгүй" />}
+            keyExtractor= {this._keyExtractor}
+            
             data={this.state.data}
             renderItem={this.renderItem}
             ListHeaderComponent={this.renderHeader}
@@ -181,6 +191,9 @@ const styles = StyleSheet.create({
   header:{
     backgroundColor: "#00BFFF",
     height:200,
+  },
+  emptyContainer:{
+    alignItems:'center'
   },
   avatar: {
     width: 130,

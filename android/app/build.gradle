@@ -138,6 +138,8 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-restart')
+    implementation project(':@react-native-community_datetimepicker')
     implementation project(':react-native-image-picker')
     implementation project(':react-native-smart-splash-screen')
     implementation project(':react-native-icons')

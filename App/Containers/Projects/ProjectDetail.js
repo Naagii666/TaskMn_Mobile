@@ -3,6 +3,7 @@ import {bindActionCreators} from 'redux'
 import React from 'react'
 import _ from 'lodash'
 import { fromJS } from "immutable";
+import { Table, Row, Rows,Cell,TableWrapper } from 'react-native-table-component';
 import {Alert, Modal,ActivityIndicator,H3,View, Text, FlatList, RefreshControl, ScrollView,TouchableHighlight ,Image,StyleSheet, StatusBar, TouchableOpacity,BackHandler,TextInput,Dimensions} from 'react-native'
 //import all the basic component we have used
 import Icon from 'react-native-vector-icons/FontAwesome'
@@ -12,24 +13,26 @@ import {  Card, ListItem, Button ,Header,Overlay } from 'react-native-elements'
 import { getAllWorkers } from '../Workers/WorkersActions'
 import { onBidProject,getBidListHire } from './ProjectsActions'
 import HTML from 'react-native-render-html';
+import ImageView from 'react-native-image-view';
 class ProjectDetail extends React.Component {
-  
-    state = {
-		  data:[],
-		  isVisible : false,
-		  bidView: false,
-		  userName:'',
-		  Price:'',
-		  Duration:'',
-		  Description:'',
-		  projectID:'',
-	};
+	constructor(props) {
+		super(props);
+			this.state = {
+				data:[],
+				isVisible : false,
+				bidView: false,
+				userName:'',
+				Price:'',
+				Duration:'',
+				Description:'',
+				projectID:'',
+				isImageViewVisible:false,
+			};
+	}
 
-	componentDidMount() {
-		this.setState({data: this.props.navigation.getParam('item', []) });
-		this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
-		this.props.getAllWorkers()
 	
+	viewImage(){
+		this.setState({isImageViewVisible: false});
 	}
 	_onRefresh() {
 		this.props.getBidListHire()
@@ -37,9 +40,9 @@ class ProjectDetail extends React.Component {
 	keyExtractor = (item, index) => index.toString();
 	BidProject(){
 		const item = this.props.navigation.getParam('item', []);
+		this.setState({projectID:item.ID})
 		let error = this.formValidate()
 		if(error) return
-		this.setState({projectID:item.ID})
 		this.props.onBidProject(this.state)
 		this.setState({isVisible: false})
 	}
@@ -55,6 +58,7 @@ class ProjectDetail extends React.Component {
 		}
 	}
 	componentWillReceiveProps(){
+		this.setState({data: this.props.navigation.getParam('item', []) });
 		this.findUser()
 	}
 	findUser(){
@@ -69,18 +73,26 @@ class ProjectDetail extends React.Component {
 	})
 	return data
 	}
-	findUserName(){
+	findUserName(lancerID){
 		const workers = this.props.workers
 		const item = this.props.navigation.getParam('item', []);
 		var data = null
 		workers.forEach((worker) => {
-			if(worker.UserID === item.UserID) {
+			if(worker.UserID === lancerID) {
 				data = worker.UserName;
 		}
 	})
 	return data
 	}
-
+	componentDidMount() {
+		
+		this.props.getAllWorkers()
+		this.props.getBidListHire()
+	}
+	// componentWillMount() {
+	// 	const item = this.props.navigation.getParam('item', []);
+	// 	this.setState({data:item})
+	// }
 	componentWillUnmount() {
 		this.backHandler.remove()
 	}
@@ -89,6 +101,7 @@ class ProjectDetail extends React.Component {
 		return true;
 	}
 	goBack(){
+		this.setState({bidView: false});
 		this.props.navigation.navigate('Tabs',{
 		})
 	}
@@ -102,7 +115,7 @@ class ProjectDetail extends React.Component {
 						onPress={() => {
 							this.props.navigation.navigate('Tabs',{
 							})
-            }}>
+            			}}>
 					<View >
 						<Icon name="chevron-left" size={16} color="#fff"/>
 						{/* <Text style={{color:"#fff", fontSize:10}}>Буцах</Text> */}
@@ -135,6 +148,24 @@ class ProjectDetail extends React.Component {
 					
 		)
 	}
+	deleteProject(){
+		Alert.alert(
+			'',
+			'Энэ ажлыг устгах уу ?',
+			[
+			  {
+				text: 'Үгүй',
+				onPress: () => console.log('Cancel Pressed'),
+				style: 'cancel',
+			  },
+			  {text: 'Тийм', onPress: () => {
+				
+			  }},
+			],
+			{ cancelable: true },
+		  );
+		  
+	}
 	navigateDetail(item){
 		this.props.navigation.navigate('WorkerDetail',{
 		  item: item
@@ -151,16 +182,55 @@ class ProjectDetail extends React.Component {
 			/>
 		);
 	};
-	
+	EmptyComponent = ({ title }) => (
+		<View style={styles.emptyContainer}>
+		  <Text style={styles.emptyText}>{title}</Text>
+		</View>
+	  );
+	renderLeftComponentModal(){
+		return(
+			<View style={{flex:1}} >
+				<TouchableOpacity 
+						onPress={() => {
+							this.setState({bidView: false});
+                		}}>
+					<View >
+						<Icon name="chevron-left" size={16} color="#fff"/>
+						{/* <Text style={{color:"#fff", fontSize:10}}>Буцах</Text> */}
+					</View>
+					
+				</TouchableOpacity>
+			</View>
+		)
+	}
 
 	_renderEmpty() {
 		return <H3>Мэдэгдэл алга байна.</H3>
 	}
-	renderItem = ({ item }) => (
+	renderItem = ({ item }) =>{ 
+		const data = this.props.navigation.getParam('item', []);
+		// let TableData = item.forEach((item) => [this.findUserName(item.LancerID),item.Description, item.Cap, item.Time])
+		// let TableData = ['Нэр','Тайлбар','Үнийн санал', 'Хугацаа','Үйлдэл']
+    	// let TableHead = ['Нэр','Тайлбар','Үнийн санал', 'Хугацаа','Үйлдэл']
+		return(
 		<View>
-			{item.userName}
+			{/* <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
+              <Row data={TableHead} flexArr={[2, 2, 2,2,2]}  />
+              <Rows data={TableData} flexArr={[2, 2, 2,2,2]} />
+            </Table> */}
+			{data.ID==item.ProjectID?
+			<View>
+			<Text>{item.Cap}</Text>
+			<Text>{item.Time}</Text>
+			<Text>{item.Description}</Text>
+			<TouchableOpacity>
+				<Text>Зөвшөөрөх</Text>
+			</TouchableOpacity>
+			</View>:null
+			}
 		</View>
-	)
+		)
+	}
 
   render() {
 	const { navigation } = this.props;
@@ -168,6 +238,16 @@ class ProjectDetail extends React.Component {
 	const item = navigation.getParam('item', []);
 	const isMyProjects = navigation.getParam('isMyProjects', 'true');
 	const regex = /([&].*?[;])*(<.*?>)/ig;
+	const images = [
+		{
+			source: {
+				uri: 'https://www.w3schools.com/w3css/img_lights.jpg',
+			},
+			title: 'Paris',
+			width: 806,
+			height: 720,
+		},
+	];
     return (
       <View style={{flex:1}}>
         <Header
@@ -251,15 +331,19 @@ class ProjectDetail extends React.Component {
 					</View>
 					
 				</Overlay>
-				<Overlay
-  					isVisible={this.state.bidView}
-  					onBackdropPress={() => this.setState({ bidView: false })}
+
+
+				<Modal
+						visible={this.state.bidView}
+						animationType="slide"
+          				transparent={false}
 				>
 					<Header
 						containerStyle={{
 							height:Header2.HEIGHT,
 							backgroundColor: '#4285F4',
 						}}
+						leftComponent={this.renderLeftComponentModal()}
 						centerComponent={{ text: ' Санал өгсөн хэрэглэгчид', style: { color: '#fff',flex:1,fontWeight:'bold',fontSize:14 } }}
 					/>
 				<View>
@@ -275,33 +359,21 @@ class ProjectDetail extends React.Component {
 								onRefresh={this._onRefresh.bind(this)}
 								/>
 							}
+							ListEmptyComponent={
+								<this.EmptyComponent title="Санал байхгүй байна." />
+							  }
 							keyExtractor={this.keyExtractor}
 							data={bid_list_hire}
 							renderItem={this.renderItem}
 							/>
+							// this.renderItem(bid_list_hire)
 						)
 					}
 					</ScrollView>
-					<View style={{flexDirection:'row',}}>
-							<TouchableOpacity style={[styles.comfirmButton,{alignContent:'center',
-														justifyContent: 'center',}]} 
-										// onPress={() => this.BidProject()}
-										>
-										<Text style={{color:'#fff',justifyContent:'center',
-														textAlign:'center',}}>Батлах</Text>
-							</TouchableOpacity>
-							<TouchableOpacity style={[styles.closeButton,{alignContent:'center',
-														justifyContent: 'center',}]} 
-										onPress={() => this.setState({bidView: false})}
-										>
-										<Text style={{color:'#fff',justifyContent:'center',
-														textAlign:'center',}}>Хаах</Text>
-							</TouchableOpacity>
-						</View>
 				</View>
 					
 					
-				</Overlay>
+				</Modal>
 
           			<View style={styles.container}>
             			<View>
@@ -340,7 +412,7 @@ class ProjectDetail extends React.Component {
                   					 onPress={() => this.navigateDetail(this.findUser())}
 									  >
                   						<Text style={{fontSize:18,color:'#3389ff',marginTop:5,}}>
-											{this.findUserName()}
+											{this.findUserName(item.UserID)}
 										</Text>
                 					</TouchableOpacity>
 									
@@ -367,11 +439,23 @@ class ProjectDetail extends React.Component {
 									Зураг 
 								</Text>
 							</View>
-							<View style={{marginVertical:30}}>
-							{/* <Image
-          						style={{width: 50, height: 50}}
-          						source={{uri: 'https://facebook.github.io/react-native/img/tiny_logo.png'}}
-        					/> */}
+							<View style={{marginBottom:50,width: 100, height: 100}}>
+							<TouchableOpacity style={{flex:1}} onPress={() =>  this.setState({ isImageViewVisible: true })}>
+								<Image
+									style={{width: 100, height: 100}}
+									source={{uri: 'https://www.w3schools.com/w3css/img_lights.jpg'}}
+								/>
+							</TouchableOpacity>
+							<ImageView
+								images={images}
+								imageIndex={0}
+								isSwipeCloseEnabled={true}
+								isPinchZoomEnabled={true}
+								isTapZoomEnabled={true}
+								isVisible={this.state.isImageViewVisible}
+								onClose = {() =>  this.setState({ isImageViewVisible: false })}
+								// renderFooter={(currentImage) => (<View><Text>My footer</Text></View>)}
+							/>
 							</View> 
             			</View>
           			</View>
@@ -396,16 +480,15 @@ class ProjectDetail extends React.Component {
 							</View>
 							:
 							<View style={styles.constContainer}>
-								<TouchableOpacity style={[styles.backButton]} 
+								<TouchableOpacity style={[styles.deleteButton]} 
                   					onPress={() => {
-										this.props.navigation.navigate('Tabs',{
-										})
+										this.deleteProject()
 								  	}}
 									  >
-                  					<Text style={styles.bidText}>Буцах</Text>
+                  					<Text style={styles.bidText}>Устгах</Text>
                 				</TouchableOpacity>
 								<TouchableOpacity style={[styles.bidButton]} 
-                  					onPress={() => this.setState({bidView: true})}
+									  onPress={() => this.setState({ bidView: true  })}
 									  >
                   					<Text style={styles.bidText}>Санал харах</Text>
                 				</TouchableOpacity>
@@ -429,7 +512,9 @@ export default connect(
 	dispatch => {
 	  return {
 		onBidProject: bindActionCreators(onBidProject, dispatch),
+		getBidListHire: bindActionCreators(getBidListHire, dispatch),
 		getAllWorkers: bindActionCreators(getAllWorkers, dispatch),
+		
 	  }
 	}
  )(ProjectDetail)
@@ -458,6 +543,14 @@ const styles = StyleSheet.create({
 		alignItems:'center',
 		marginHorizontal:'5%'
 	},
+	emptyContainer:{
+		alignItems:'center',
+		marginTop:20 
+	  },
+	  emptyText:{
+		marginTop:20 ,
+		color:'black'
+	  },
 	  container:{
 		margin:20
 	  },
@@ -501,6 +594,18 @@ const styles = StyleSheet.create({
 		height:'70%',
 		borderWidth:1,
 		borderColor:'#B3B3B3',
+		marginHorizontal:'5%',
+		marginVertical:5
+	  },
+	  deleteButton:{
+		backgroundColor:'#f28787',
+		alignContent:'center',
+		justifyContent: 'center',
+		width:'40%',
+		borderRadius:10,
+		height:'70%',
+		borderWidth:1,
+		borderColor:'#ec7a73',
 		marginHorizontal:'5%',
 		marginVertical:5
 	  },

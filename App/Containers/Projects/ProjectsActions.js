@@ -5,3 +5,5 @@ export function getUserProjects() { return { type: types.GET_USER_PROJECTS }}
 export function getBidListHire() { return { type: types.GET_BID_LIST_HIRE }}
 export function getBidListLancer() { return { type: types.GET_BID_LIST_LANCER }}
 export function onBidProject(payload) { return { type: types.ON_BID_PROJECT , payload }}
+
+export function releaseData() { return { type: types.RELEASE_DATA }}

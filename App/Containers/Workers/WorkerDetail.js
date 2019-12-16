@@ -76,50 +76,69 @@ class WorkerDetail extends React.Component {
           <ScrollView>
             <View style={styles.container}>
           <View style={styles.header}>
-            <View style={styles.headerContent}>
+          <View style={styles.headerContent}>
                 
-                  {item.ProPicture?
-                    <Image style={styles.avatar}
-                      source={{uri: 'http://task.mn/content/'+item.ProPicture+''}}/>
-                      :
-                    <Image style={styles.avatar}
-                      source={{uri: 'http://task.mn/Content/images/UserPictures/user2.png'}}/>
-                  }
-                <Text style={styles.name}>{item.FirstName} {item.LastName}</Text>
-                {item.Job?
-                <Text style={styles.userInfo}>{item.Job}</Text>
-                :null
+                {item.ProPicture?
+                  <Image style={[styles.avatar,{alignSelf: 'center',}]}
+                    source={{uri: 'http://task.mn/content/'+item.ProPicture+''}}/>
+                    :
+                    <Image style={[styles.avatar,{alignSelf: 'center',}]}
+                    source={{uri: 'http://task.mn/Content/images/UserPictures/user2.png'}}/>
                 }
-                {item.UserEmail?
-                <Text style={styles.userInfo}>{item.UserEmail}</Text>
-                :null
-                }
-                {item.Education?
-                <Text style={styles.userInfo}>{item.Education}</Text>
-                :null
-                }
-                {item.PhoneNumber?
-                <Text style={styles.userInfo}>{item.PhoneNumber}</Text>
-                :null
-                }
-                {item.HomeAddress?
-                <Text style={styles.userInfo}>{item.HomeAddress}</Text>
-                :null
-                }
-                {item.Description?
-                
-                <ViewMoreText
-                  numberOfLines={3}
-                  renderViewMore={this.renderViewMore}
-                  renderViewLess={this.renderViewLess}
-                  textStyle={{textAlign: 'justify'}}
-                >
-                  <Text style={styles.userInfo}>
-                    {item.Description}
-                  </Text>
-                </ViewMoreText>
-                :null
-                }
+                <View style={{marginBottom:10}}>
+                  <Text style={[styles.name,{alignSelf: 'center',}]}>{item.FirstName} {item.LastName}</Text>
+                </View>
+              {item.Job?
+                <View style={styles.infoView}>
+                    <Text style={styles.titleInfo}>Ажил :</Text>
+                    <Text style={styles.userInfo}>{item.Job}</Text>
+                </View>
+              :null
+              }
+              {item.UserEmail?
+                <View style={styles.infoView}>
+                  <Text style={styles.titleInfo}>Имэйл :</Text>
+                  <Text style={styles.userInfo}>{item.UserEmail}</Text>
+                </View>
+              :null
+              }
+              {item.Education?
+                <View style={styles.infoView}>
+                  <Text style={styles.titleInfo}>Боловсрол :</Text>
+                  <Text style={styles.userInfo}>{item.Education}</Text>
+                </View>
+              
+              :null
+              }
+              {item.PhoneNumber?
+                <View style={styles.infoView}>
+                  <Text style={styles.titleInfo}>Утас :</Text>
+                  <Text style={styles.userInfo}>{item.PhoneNumber}</Text>
+                </View>
+              :null
+              }
+              {item.HomeAddress?
+                <View style={styles.infoView}>
+                  <Text style={styles.titleInfo}>Гэрийн хаяг :</Text>
+                  <Text style={styles.userInfo}>{item.HomeAddress}</Text>
+                </View>
+              :null
+              }
+              {item.Description?
+                <View style={{marginTop:10}}>
+                  <ViewMoreText
+                    numberOfLines={3}
+                    renderViewMore={this.renderViewMore}
+                    renderViewLess={this.renderViewLess}
+                    textStyle={{textAlign: 'justify'}}
+                  >
+                    <Text style={styles.userInfo}>
+                      {item.Description}
+                    </Text>
+                  </ViewMoreText>
+                </View>
+              :null
+              }
                 
             </View>
           </View>
@@ -193,7 +212,6 @@ const styles = StyleSheet.create({
   },
   headerContent:{
     padding:30,
-    alignItems: 'center',
   },
   avatar: {
     width: 130,
@@ -208,9 +226,20 @@ const styles = StyleSheet.create({
     color:"#000000",
     fontWeight:'600',
   },
+  infoView:{
+    width:'70%',
+    alignSelf:'center',
+    flexDirection:'row', 
+    justifyContent:'space-between' 
+  },
   userInfo:{
     fontSize:14,
     color:"black",
+    fontWeight:'300',
+  },
+  titleInfo:{
+    fontSize:14,
+    color:"#4285F4",
     fontWeight:'300',
   },
   body:{

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 
-const BASE_URL = 'http://192.168.88.16:45455/'
+const BASE_URL = 'https://taskmobile.conveyor.cloud/'
 
 export function request(token) {
 	var axiosInstance = axios.create({
