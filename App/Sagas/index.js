@@ -14,7 +14,7 @@ import { startup } from './StartupSagas'
 import { getUserAvatar } from './GithubSagas'
 import projectsSaga from '../Containers/Projects/ProjectsSaga'
 import profileSaga from '../Containers/Profile/ProfileSaga'
-import workersSaga from '../Containers/Workers/WorkersSaga'
+import workersSaga from '../Containers/Search/WorkersSaga'
 import addProjectSaga from '../Containers/AddProject/AddSaga'
 
 /* ------------- API ------------- */

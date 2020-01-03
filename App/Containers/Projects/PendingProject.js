@@ -640,14 +640,15 @@
 import React,{Component} from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux'
-import { Text, View, TouchableOpacity, StyleSheet ,ScrollView,Dimensions,BackHandler,Alert} from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet ,ScrollView,Dimensions,BackHandler,Alert,TextInput} from 'react-native';
 import {  Card, ListItem, Button ,Header} from 'react-native-elements'
 import { Header as Header2 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import HTML from 'react-native-render-html';
 import ImageView from 'react-native-image-view';
 import { onDeleteProject ,getUserProjects} from './ProjectsActions'
-class ProjectDetail extends React.Component {   
+import { getAllWorkers } from '../Search/WorkersActions'
+class PendingProject extends React.Component {   
     componentDidMount() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
       }
@@ -663,6 +664,32 @@ class ProjectDetail extends React.Component {
         this.props.navigation.navigate('Tabs',{
         })
     } 
+    navigateDetail(item){
+		this.props.navigation.navigate('WorkerDetail',{
+		  item: item
+		  })
+    }
+    findUser(lancerID){
+        const workers = this.props.workers
+            var data = null
+            workers.forEach((worker) => {
+                if(worker.UserID === lancerID) {
+                    // this.setState({userName: worker.UserName });
+                    data = worker;
+              }
+        })
+        return data
+      }
+      findUserName(lancerID){
+            const workers = this.props.workers
+            var data = null
+            workers.forEach((worker) => {
+                if(worker.UserID === lancerID) {
+                    data = worker.UserName;
+          }
+        })
+          return data
+      }
     deleteProject(ID){
 	    Alert.alert(
             '',
@@ -745,7 +772,7 @@ class ProjectDetail extends React.Component {
                     </View>
                     {this.renderSeparator()}
                     <View style={{marginVertical:10}}>
-                        <Text style={{color:'#4285F4',}}>Үнийн санал</Text>
+                        <Text style={{color:'#4285F4',}}>Ажлын төсөв</Text>
                         <Text style={{fontSize:18,color:'black',marginTop:5,}}>
                             {item.LowPrice}₮-{item.HighPrice}₮
                         </Text>
@@ -763,27 +790,53 @@ class ProjectDetail extends React.Component {
                         </View>
                     </View>
                     {this.renderSeparator()}
-                </View>
+                    <View style={{marginVertical:10}}>
+                        <Text style={{color:'#4285F4'}}>
+                            Саналын мэдээлэл
+                        </Text>
+                    </View>
+                    <View style={{justifyContent:'space-between',flexDirection:'column', }}>
+                            <View style={styles.body}>
+                                <View style={styles.container}>
+                                    <Text style={styles.titleInfo}>Хугацаа :</Text>
+                                    <Text style={styles.titleInfo}>{item.Time + ' хоног'}</Text>
+                                </View>
+                                <View style={styles.container}>
+                                    <Text style={styles.titleInfo}>Үнэийн санал :</Text>
+                                    <Text style={styles.titleInfo}>{item.Cap+' ₮'}</Text>
+                                </View>
+                                <View style={styles.container}>
+                                    <Text style={styles.titleInfo}>Тайлбар :</Text>
+                                    <TextInput
+                                        style={styles.Summary}
+                                        numberOfLines={10}
+                                        ellipsizeMode="head"
+                                        keyboardType="default"
+                                        multiline={true}
+                                        underlineColorAndroid='transparent'
+                                        selectTextOnFocus={false}
+                                        editable={false}
+                                        value={item.BidDescription}/>
+                                </View>
+                                <View style={styles.container}>
+                                    <Text style={styles.titleInfo}>Санал илгээгч :</Text>
+                                    <TouchableOpacity 
+                                            onPress={() => this.navigateDetail(this.findUser(item.LancerID))}
+                                    >
+                                            <Text style={{fontSize:18,color:'#3389ff'}}>
+                                    {this.findUserName(item.LancerID)}
+                                    </Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <View style={styles.container}>
+                                    <Text style={styles.titleInfo}>Саналын төлөв :</Text>
+                                    <Text style={styles.titleInfo}>{item.Status}</Text>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
             </ScrollView>
-            <View style={styles.constContainer}>
-                <TouchableOpacity style={[styles.deleteButton]} 
-                    onPress={() => {
-                        this.deleteProject(item.ID)
-                    }}
-                    >
-                    <Text style={styles.bidText}>Устгах</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.bidButton]} 
-                   onPress={() => {
-                        this.props.navigation.navigate('ChooseBid', {
-                            id:item.ID
-                        }
-                    )}}
-                    >
-                    <Text style={styles.bidText}>Санал харах</Text>
-                </TouchableOpacity>
-                
-            </View>
+            
         </View>
         
         );
@@ -793,14 +846,17 @@ export default connect(
     state => ({
             loading: state.project.getIn(['on_delete_project', 'loading']),
                 // projects: state.project.getIn(['project_list', 'data']).toJS(),
+            workers: state.workers.getIn(['workers_list', 'data']),
+            loading3: state.workers.getIn(['on_choose_bid', 'loading']),
     }),
     dispatch => {
         return {
             onDeleteProject: bindActionCreators(onDeleteProject, dispatch),
             getUserProjects: bindActionCreators(getUserProjects, dispatch),
+            getAllWorkers: bindActionCreators(getAllWorkers, dispatch),
         }
     }
-)(ProjectDetail);;
+)(PendingProject);;
 const styles = StyleSheet.create({
   headerTitle: {
     color: '#fff',
@@ -855,16 +911,48 @@ const styles = StyleSheet.create({
     textAlign:'center',
     flexDirection:'row'
   },
-  deleteButton:{
-    backgroundColor:'#f28787',
-    alignContent:'center',
-    justifyContent: 'center',
-    width:'40%',
+  container: {
+    flexDirection:'row',
+    justifyContent:'space-between',
+    flex:1,
+    marginTop:10
+  },
+  textInput:{
+    width:'80%',
+    alignSelf:'center',
+    // backgroundColor:'#4285F4',
+    margin:5,
     borderRadius:10,
-    height:'70%',
     borderWidth:1,
-    borderColor:'#ec7a73',
-    marginHorizontal:'5%',
-    marginVertical:5
+    paddingHorizontal:10,
+    borderColor:'#4285F4'
+
+  },
+  Summary:{
+    width:'70%',
+    height:80,
+    alignSelf:'center',
+    paddingHorizontal:10,
+    marginLeft:'10%',
+    // backgroundColor:'#4285F4',
+    color:"#000",
+    margin:5,
+    borderRadius:10,
+    borderWidth:1,
+    borderColor:'#4285F4',
+    maxHeight:500,
+
+  },
+  userInfo:{
+    fontSize:14,
+    color:"black",
+    fontWeight:'300',
+  },
+  titleInfo:{
+    fontSize:14,
+    color:"#000",
+    fontWeight:'300',
+    maxHeight:500
+
   },
 })

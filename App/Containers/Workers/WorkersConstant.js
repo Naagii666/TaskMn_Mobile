@@ -1,3 +1,0 @@
-export const GET_ALL_WORKERS = 'get_all_workers'
-export const GET_ALL_WORKERS_FAILED = 'GET_ALL_WORKERS_FAILED'
-export const GET_ALL_WORKERS_SUCCESS = 'GET_ALL_WORKERS_SUCCESS'

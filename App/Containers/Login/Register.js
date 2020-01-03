@@ -16,11 +16,11 @@ import {
 } from 'react-native'
 import { Row, H2, H3, H4,H5, Wrapper, Separator } from '../../Components'
 import Icon from 'react-native-vector-icons/Entypo'
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import axios from 'axios'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import _ from 'lodash'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import SplashScreen from 'react-native-smart-splash-screen'
 import { setAuthenticationToken,getAuthenticationToken  } from '../../Services/storage'
 //import PushNotification from 'react-native-push-notification';
@@ -35,12 +35,17 @@ class Register extends Component {
       this.onPressNext = this.onPressNext.bind(this);
       this.onPressPrev = this.onPressPrev.bind(this);
       this.state = {
-        email   : '',
-        password: '',
-        password_confirmation: '',
-        phone:'',
-        isLoggedIn: false,
-        idxActive: 0
+        FirstName : '',
+        LastName : '',
+        UserName   : '',
+        UserEmail: '',
+        Education: '',
+        PhoneNumber: '',
+        HomeAddress: '',
+        Job: '',
+        Description:'',
+        idxActive: 0,
+        isPerson:true,
       }
       
     }
@@ -48,6 +53,9 @@ class Register extends Component {
         //SplashScreen.close(SplashScreen.animationType.scale, 850, 500)
         
      }
+    switchScreen(value){
+      this.setState({isPerson: value});
+    }
      onPressPrev = () => {
       const {idxActive} = this.state;
       if (idxActive > 0) {
@@ -62,6 +70,17 @@ class Register extends Component {
         this.refs.swiper.scrollBy(1);
       }
     }
+    renderSeparator = () => {
+      return (
+        <View
+            style={{
+            marginVertical:10,
+              borderBottomColor: '#2D3954',
+              borderBottomWidth: 1,
+                }}
+        />
+      );
+    };
      render() {
           return (
             <Swiper style={Loginstyles.wrapper} loop={false} onIndexChanged={idxActive => this.setState({idxActive})} showsButtons={true}>
@@ -69,118 +88,173 @@ class Register extends Component {
                 <Text style={Loginstyles.text}>Шинээр бүртгүүлэх</Text>
               </View>
               <View style={Loginstyles.slide2}>
-              <View style={Loginstyles.inputContainer}>
-                
-                             <TextInput style={Loginstyles.inputs}
-                              placeholder="Овог"
-                              keyboardType="email-address"
-                              underlineColorAndroid='transparent'
-                              onChangeText={(email) => this.setState({email})}/>
-                              {/* <Icon name="user" size={35} color="#4285F4" /> */}
-                          </View>
-                          <View style={Loginstyles.inputContainer}>
-                            
-                            <TextInput style={Loginstyles.inputs}
-                              placeholder="Нэр"
-                              keyboardType="email-address"
-                              underlineColorAndroid='transparent'
-                              onChangeText={(email) => this.setState({email})}/>
-                              {/* <Icon name="user" size={35} color="#4285F4" /> */}
-                          </View>
-                          <View style={Loginstyles.inputContainer}>
-                            
-                            <TextInput style={Loginstyles.inputs}
-                              placeholder="Хэрэглэгчийн нэр"
-                              keyboardType="email-address"
-                              underlineColorAndroid='transparent'
-                              onChangeText={(email) => this.setState({email})}/>
-                              {/* <Icon name="user" size={35} color="#4285F4" /> */}
-                          </View>
-                         
-            
-              </View>
-                <View style={Loginstyles.slide3}>
-                      <View style={Loginstyles.inputContainer}>
-                              
-                              <TextInput style={Loginstyles.inputs}
-                                placeholder="Утасны дугаар"
-                                keyboardType="email-address"
-                                underlineColorAndroid='transparent'
-                                onChangeText={(email) => this.setState({email})}/>
-                                {/* <Icon name='phone' size={35} color="#4285F4" /> */}
-                            </View>
-                            <View style={Loginstyles.inputContainer}>
-                              
-                              <TextInput style={Loginstyles.inputs}
-                                placeholder="Боловсрол"
-                                keyboardType="email-address"
-                                underlineColorAndroid='transparent'
-                                onChangeText={(email) => this.setState({email})}/>
-                                {/* <Icon name="graduation-cap" size={35} color="#4285F4" /> */}
-                            </View>
-                            
-                            <View style={Loginstyles.inputContainer}>
-                              
-                              <TextInput style={Loginstyles.inputs}
-                                placeholder="Гэрийн хаяг"
-                                keyboardType="email-address"
-                                underlineColorAndroid='transparent'
-                                onChangeText={(email) => this.setState({email})}/>
-                                {/* <Icon name="address" size={35} color="#4285F4" /> */}
-                            </View>
-                            
-                </View>
-                <View style={Loginstyles.slide4}>
-                <View style={Loginstyles.inputContainer}>
-                  
-                  <TextInput style={Loginstyles.inputs}
-                    placeholder="Имэйл хаяг"
-                    keyboardType="email-address"
-                    underlineColorAndroid='transparent'
-                    onChangeText={(email) => this.setState({email})}/>
-                    {/* <Icon name="mail-with-circle" size={35} color="#4285F4" /> */}
-                </View>
-                <View style={Loginstyles.inputContainer}>
-                  
-                  <TextInput style={Loginstyles.inputs}
-                    placeholder="Нууц үг"
-                    secureTextEntry={true}
-                    underlineColorAndroid='transparent'
-                    onChangeText={(password) => this.setState({password})}/>
-                    {/* <Icon name="key" size={35} color="#4285F4"/> */}
-                </View>
-                
-                <View style={Loginstyles.inputContainer}>
-                  
-                  <TextInput style={Loginstyles.inputs}
-                    placeholder="Нууц үг баталгаажуулах"
-                    keyboardType="email-address"
-                    underlineColorAndroid='transparent'
-                    onChangeText={(email) => this.setState({email})}/>
-                    {/* <Icon name="key" size={35} color="#4285F4" /> */}
-                </View>
-                
-              </View>
-              <View style={Loginstyles.slide5}>
-                <View>
-                  <TouchableOpacity style={[Loginstyles.buttonContainer2, Loginstyles.loginButton,{margin:0}]} 
-                    onPress={() => this._onLoginFunction()}>
-                    <Text style={[Loginstyles.loginText,{fontSize: 30,fontWeight: 'bold'}]}>Бүртгүүлэх</Text>
-                </TouchableOpacity>
-               </View>
-               {/* <View >
-                 <TouchableOpacity style={[Loginstyles.buttonContainer2, Loginstyles.loginButton,]} 
-                  onPress={() => this.props.navigation.navigate('LoginScreen')}>
-                  <Text style={[Loginstyles.loginText,{fontSize: 30,fontWeight: 'bold'}]}>Буцах</Text>
-                </TouchableOpacity>
-               
-              </View>  */}
+
+              <ScrollView style={{width:'100%'}}>
+                <KeyboardAwareScrollView resetScrollToCoords={{x:0,y:0}} scrollEnabled={false}>
+                    {/* <Text style={{color:'black'}}>{this.state.UserName}</Text> */}
+                  <View style={{marginVertical:10,alignContent:'center'}}>
+                    <View style={{margin:10,alignSelf:'center'}}>
+                      <Text style={{color:'#2D3954',fontWeight:'bold',fontSize:20}}>ХЭРЭГЛЭГЧИЙН БҮРТГЭЛ</Text>
+                    </View>
+                    <View style={styles.switcher}>
+                      <TouchableHighlight underlayColor="#fff" style={this.state.isPerson?([styles.switchButton,						styles.isActive]):([styles.switchButton])}
+                              onPress={() => this.switchScreen(true)}>
+                          <Text style={this.state.isPerson?{color:'#FFF'}:{color:'#4285F4'}}>Хувь хүн</Text>
+                      </TouchableHighlight>
+
+                        <TouchableHighlight underlayColor="#fff" style={this.state.isPerson?([styles.switchButton]):([styles.switchButton,styles.isActive])}
+                              onPress={() => this.switchScreen(false)}>
+                          <Text style={this.state.isPerson?{color:'#4285F4'}:{color:'#FFF'}}>Байгууллага</Text>
+                      </TouchableHighlight>
+                    </View>
+                    {this.renderSeparator()}
+                  <Text style={styles.titleInfo}>Овог</Text>
+                  <View style={styles.textInput}>
+                    <TextInput
+                      style={styles.userInfo}
+                      underlineColorAndroid='transparent'
+                      selectTextOnFocus={false}
+                      // value={this.state.FirstName}
+                      onChangeText={(FirstName) => this.setState({FirstName})}/>
+                  </View>
+                  <Text style={styles.titleInfo}>Нэр</Text>
+                  <View style={styles.textInput}>
+                    <TextInput
+                      underlineColorAndroid='transparent'
+                      selectTextOnFocus={false}
+                      // value={this.state.LastName}
+                      onChangeText={(LastName) => this.setState({LastName})}
+                      />
+                  </View>
+                  <Text style={styles.titleInfo}>Хэрэглэгчийн нэр</Text>
+                    <View style={styles.textInput}>
+                      <TextInput
+                      underlineColorAndroid='transparent'
+                      selectTextOnFocus={false}
+                      // value={this.state.UserName}
+                      onChangeText={(UserName) => this.setState({UserName})}
+                      />
+                    </View>
+                    <Text style={styles.titleInfo}>И-мэйл</Text>
+                    <View style={styles.textInput}>
+                      <TextInput
+                      underlineColorAndroid='transparent'
+                      selectTextOnFocus={false}
+                      // value={this.state.UserEmail}
+                      onChangeText={(UserEmail) => this.setState({UserEmail})}
+                      />
+                    </View>
+                    <Text style={styles.titleInfo}>Утасны дугаар</Text>
+                    <View style={styles.textInput}>
+                      <TextInput
+                      underlineColorAndroid='transparent'
+                      selectTextOnFocus={false}
+                      // value={this.state.PhoneNumber}
+                      onChangeText={(PhoneNumber) => this.setState({PhoneNumber})}/>
+                    </View>
+                    <Text style={styles.titleInfo}>Боловсрол</Text>
+                    <View style={styles.textInput}>
+                      <TextInput
+                      underlineColorAndroid='transparent'
+                      selectTextOnFocus={false}
+                      // value={this.state.Education}
+                      onChangeText={(Education) => this.setState({Education})}
+                      />
+                    </View>
+                    <Text style={styles.titleInfo}>Гэрийн хаяг</Text>
+                    <View style={styles.textInput}>
+                      <TextInput
+                      underlineColorAndroid='transparent'
+                      selectTextOnFocus={false}
+                      // value={this.state.HomeAddress}
+                      onChangeText={(HomeAddress) => this.setState({HomeAddress})}
+                      />
+                    </View>
+                    <Text style={styles.titleInfo}>Танилцуулга</Text>
+                    <View style={styles.Summary}>
+                      <TextInput
+                        numberOfLines={10}
+                        ellipsizeMode="head"
+                        keyboardType="default"
+                        multiline={true}
+                        underlineColorAndroid='transparent'
+                        selectTextOnFocus={false}
+                        // value={this.state.Description}
+                        onChangeText={(Description) => this.setState({Description})}
+                        />
+                    </View>
+                    <View style={{width:'80%',marginVertical:20 , alignSelf:'center'}}>
+                      <Button
+                          buttonStyle={{
+                            borderRadius:10,
+                            width:'90%',
+                            backgroundColor:'#69d275',
+                            alignSelf:'center'
+                          }}
+                          onPress={() => this._onLoginFunction()}
+                          title=" Бүртгүүлэх"
+                        />
+                    </View>
+                  </View>
+                </KeyboardAwareScrollView>
+              </ScrollView>
               </View>
             </Swiper>
           )
      }
     }
-     
+    const styles = StyleSheet.create({
+      
+      textInput:{
+        width:'80%',
+        alignSelf:'center',
+        // backgroundColor:'#4285F4',
+        margin:5,
+        borderRadius:10,
+        borderWidth:1,
+        paddingHorizontal:10,
+        borderColor:'#4285F4'
+      },
+      Summary:{
+        width:'80%',
+        height:100,
+        alignSelf:'center',
+        paddingHorizontal:10,
+        // backgroundColor:'#4285F4',
+        margin:5,
+        borderRadius:10,
+        borderWidth:1,
+        borderColor:'#4285F4',
+        maxHeight:500,
+      },
+      titleInfo:{
+        fontSize:14,
+        color:"#4285F4",
+        fontWeight:'300',
+        marginLeft:'10%'
+      },
+      switcher:{
+        width:'80%',
+        height:40,
+        borderRadius:5,
+        borderWidth:1,
+        borderColor:'#4285F4',
+        flexDirection:'row',
+        alignSelf:'center',
+        marginVertical:10,
+        justifyContent: 'space-between',
+    
+      },
+      switchButton:{
+        width:'50%',
+        alignItems:'center',
+      },
+      isActive:{
+        backgroundColor:'#4285F4',
+        borderBottomColor:'#4285F4',
+        borderBottomWidth:3,
+      },
+    });
     const Loginstyles = StyleSheet.create({
       container: {
         flex: 1,
@@ -198,34 +272,16 @@ class Register extends Component {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#4285f4'
+        backgroundColor: '#FFF'
       },
       slide2: {
-        flex: 1,
+        // flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#4f8dfe'
-      },
-      slide3: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#5a96ff'
-      },
-      slide4: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#669fff'
-      },
-      slide5: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#4285f4'
+        backgroundColor: '#FFF'
       },
       text: {
-        color: '#fff',
+        color: '#4285f4',
         fontSize: 30,
         fontWeight: 'bold'
       },

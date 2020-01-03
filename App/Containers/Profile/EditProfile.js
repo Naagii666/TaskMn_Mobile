@@ -3,13 +3,12 @@ import {bindActionCreators} from 'redux'
 import React from 'react'
 import _ from 'lodash'
 import { fromJS } from "immutable";
-import {ActivityIndicator, H3,View, Text, FlatList,ScrollView, RefreshControl,TouchableOpacity, TouchableHighlight ,Image,StyleSheet, TextInput,BackHandler,Alert,KeyboardAvoidingView} from 'react-native'
+import {ActivityIndicator, H3,View, Text, FlatList,ScrollView, RefreshControl,TouchableOpacity, TouchableHighlight ,Image,StyleSheet, TextInput,BackHandler,Alert,} from 'react-native'
 //import all the basic component we have used
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { Header as Header2 } from 'react-navigation';
 import {  Card, ListItem, Button,Rating, AirbnbRating ,Avatar,Header} from 'react-native-elements'
-import { getUserProjects } from '../Projects/ProjectsActions'
-import { getProfile } from './ProfileActions'
+import { editProfile ,getProfile} from './ProfileActions'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 class EditProfile extends React.Component {
   constructor(props) {
@@ -29,7 +28,7 @@ class EditProfile extends React.Component {
   componentDidMount() {
     this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     const { navigation } = this.props;
-    const item = navigation.getParam('user', 'user');
+    const item = navigation.getParam('item', []);
     this.setState({FirstName:item.FirstName,
                     LastName:item.LastName,
                     UserName:item.UserName,
@@ -41,19 +40,11 @@ class EditProfile extends React.Component {
                     HomeAddress:item.HomeAddress
     })
   }
-  componentWillMount(){
-    const { navigation } = this.props;
-    const item = navigation.getParam('user', 'user');
-    this.setState({FirstName:item.FirstName,
-                    LastName:item.LastName,
-                    UserName:item.UserName,
-                    UserEmail:item.UserEmail,
-                    Education:item.Education,
-                    PhoneNumber:item.PhoneNumber,
-                    Job:item.Job,
-                    Description:item.Description,
-                    HomeAddress:item.HomeAddress
-    })
+
+  change(){
+    this.props.editProfile(this.state)
+    this.props.getProfile()
+    this.goBack()
   }
   componentWillUnmount(){
     this.backHandler.remove()
@@ -82,9 +73,9 @@ class EditProfile extends React.Component {
                             this.props.navigation.navigate('Tabs',{
                       })
             }}>
-          <View >
-            <Icon name="chevron-left" size={16} color="#fff"/>
-            {/* <Text style={{color:"#fff", fontSize:10}}>Буцах</Text> */}
+          <View style={{flexDirection:'row'}}>
+              <Icon name="chevron-left" size={16} color="#fff"/>
+              <Text style={{color:'#FFF'}}> Буцах</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -102,68 +93,99 @@ class EditProfile extends React.Component {
           
         />
         <ScrollView>
-          <KeyboardAwareScrollView resetScrollToCoords={{x:0,y:0}} >
+          <KeyboardAwareScrollView resetScrollToCoords={{x:0,y:0}} scrollEnabled={false}>
               {/* <Text style={{color:'black'}}>{this.state.UserName}</Text> */}
             <View style={{marginVertical:10,alignContent:'center'}}>
               {/* <Icon name="v-card" size={32} color="#f9ac19" /> */}
-              <View style={styles.infoView}>
-                      <Text style={styles.titleInfo}>Овог :</Text>
-                      <TextInput
-                        style={styles.userInfo}
-                        underlineColorAndroid='transparent'
-                        selectTextOnFocus={false}
-                        value={this.state.FirstName}
-                        onChangeText={(FirstName) => this.setState({FirstName})}/>
-                </View>
+            <Text style={styles.titleInfo}>Овог</Text>
+            <View style={styles.textInput}>
+              <TextInput
+                style={styles.userInfo}
+                underlineColorAndroid='transparent'
+                selectTextOnFocus={false}
+                value={this.state.FirstName}
+                onChangeText={(FirstName) => this.setState({FirstName})}/>
+            </View>
+            <Text style={styles.titleInfo}>Нэр</Text>
+            <View style={styles.textInput}>
               <TextInput
                 underlineColorAndroid='transparent'
                 selectTextOnFocus={false}
                 value={this.state.LastName}
                 onChangeText={(LastName) => this.setState({LastName})}
                 />
-              <TextInput
+            </View>
+            <Text style={styles.titleInfo}>Хэрэглэгчийн нэр</Text>
+              <View style={styles.textInput}>
+                <TextInput
                 underlineColorAndroid='transparent'
                 selectTextOnFocus={false}
                 value={this.state.UserName}
                 onChangeText={(UserName) => this.setState({UserName})}
                 />
-              <TextInput
+              </View>
+              <Text style={styles.titleInfo}>И-мэйл</Text>
+              <View style={styles.textInput}>
+                <TextInput
                 underlineColorAndroid='transparent'
                 selectTextOnFocus={false}
                 value={this.state.UserEmail}
                 onChangeText={(UserEmail) => this.setState({UserEmail})}
                 />
-              <TextInput
+              </View>
+              <Text style={styles.titleInfo}>Утасны дугаар</Text>
+              <View style={styles.textInput}>
+                <TextInput
                 underlineColorAndroid='transparent'
                 selectTextOnFocus={false}
                 value={this.state.PhoneNumber}
                 onChangeText={(PhoneNumber) => this.setState({PhoneNumber})}/>
-              <TextInput
+              </View>
+              <Text style={styles.titleInfo}>Боловсрол</Text>
+              <View style={styles.textInput}>
+                <TextInput
                 underlineColorAndroid='transparent'
                 selectTextOnFocus={false}
                 value={this.state.Education}
                 onChangeText={(Education) => this.setState({Education})}
                 />
-              <TextInput
+              </View>
+              <Text style={styles.titleInfo}>Гэрийн хаяг</Text>
+              <View style={styles.textInput}>
+                <TextInput
                 underlineColorAndroid='transparent'
                 selectTextOnFocus={false}
                 value={this.state.HomeAddress}
                 onChangeText={(HomeAddress) => this.setState({HomeAddress})}
                 />
-              
-              <KeyboardAvoidingView>
+              </View>
+              <Text style={styles.titleInfo}>Танилцуулга</Text>
+              <View style={styles.Summary}>
                 <TextInput
+                  numberOfLines={10}
+                  ellipsizeMode="head"
+                  keyboardType="default"
+                  multiline={true}
                   underlineColorAndroid='transparent'
                   selectTextOnFocus={false}
                   value={this.state.Description}
                   onChangeText={(Description) => this.setState({Description})}
                   />
-                  
-              </KeyboardAvoidingView>
-              
-              <TouchableOpacity>
-                <Text>Засварлах</Text>
-              </TouchableOpacity>
+              </View>
+              <View style={{width:'80%',marginVertical:20 , alignSelf:'center'}}>
+                <Button
+                    buttonStyle={{
+                      borderRadius:10,
+                      width:'90%',
+                      backgroundColor:'#69d275',
+                      alignSelf:'center'
+                    }}
+                    onPress={() => {
+                          this.change()
+                    }}
+                    title=" Засварлах"
+                  />
+              </View>
             </View>
           </KeyboardAwareScrollView>
         </ScrollView>
@@ -174,16 +196,13 @@ class EditProfile extends React.Component {
 
 export default connect(
    state => ({
-		loading: state.profile.getIn(['profile_list', 'loading']),
-		profile: state.profile.getIn(['profile_list', 'data']),
-          // projects: state.project.getIn(['project_list', 'data']).toJS(),
-    loading2: state.project.getIn(['user_projects', 'loading']),
-		userProjects: state.project.getIn(['user_projects', 'data'])
+		loading: state.profile.getIn(['edit_profile', 'loading']),
+		profile: state.profile.getIn(['edit_profile', 'data']),
    }),
    dispatch => {
      return {
+       editProfile: bindActionCreators(editProfile, dispatch),
        getProfile: bindActionCreators(getProfile, dispatch),
-       getUserProjects: bindActionCreators(getUserProjects, dispatch)
      }
    }
 )(EditProfile);
@@ -218,6 +237,30 @@ const styles = StyleSheet.create({
     fontSize:14,
     color:"black",
     fontWeight:'300',
+  },
+  textInput:{
+    width:'80%',
+    alignSelf:'center',
+    // backgroundColor:'#4285F4',
+    margin:5,
+    borderRadius:10,
+    borderWidth:1,
+    paddingHorizontal:10,
+    borderColor:'#4285F4'
+
+  },
+  Summary:{
+    width:'80%',
+    height:100,
+    alignSelf:'center',
+    paddingHorizontal:10,
+    // backgroundColor:'#4285F4',
+    margin:5,
+    borderRadius:10,
+    borderWidth:1,
+    borderColor:'#4285F4',
+    maxHeight:500,
+
   },
   body:{
     backgroundColor: "#FFF",
@@ -263,6 +306,8 @@ const styles = StyleSheet.create({
     fontSize:14,
     color:"#4285F4",
     fontWeight:'300',
+    marginLeft:'10%'
+
   },
   info:{
     fontSize:18,

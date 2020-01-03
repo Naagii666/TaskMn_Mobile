@@ -11,7 +11,7 @@ function* addProject({payload}) {
 		var formData = new FormData();
 		formData.append('Name', payload.name)
 		formData.append('StartDate', payload.startDate)
-		formData.append('TypeID', payload.typeID)
+		formData.append('TypeID', payload.TypeID)
 		formData.append('Description', payload.description)
 		formData.append('Skills', payload.skills)
 		formData.append('LowPrice', payload.lowPrice)
@@ -19,8 +19,8 @@ function* addProject({payload}) {
 		formData.append('Duration', payload.duration)
 		let token = yield getAuthenticationToken()
 		let res = yield request(token).post(`api/project/AddProject`,formData)
-
-		if(!res.data.success) {
+		// alert(res.data)
+		if(!res.data) {
 			return yield put({
 				type: types.ADD_PROJECT_FAILED
 			})
@@ -30,28 +30,17 @@ function* addProject({payload}) {
 			type: types.ADD_PROJECT_SUCCESS,
 			payload: res.data
 		})
-
+		
 		yield put({
 			type: types.GET_PROJECT_TYPES
 		})
 
-		// yield put(NavigationActions.back())
-	} catch(e) {
-		alert(e.message)
-		//alert(e.message)
-		yield put({
-			type: types.ADD_PROJECT_FAILED
-		})
-	}
-	// axios.post('https://taskmobile-mo4.conveyor.cloud/api/project/AddProject',{
-	// 	Name: 'Fred',
-	//   })
-  	// 	.then(function (response) {
-    // 	console.log(response);
-  	// })
-  	// .catch(function (error) {
-    // 		console.log(error);
-  	// });
+		} catch(e) {
+			alert(e.message)
+			yield put({
+				type: types.ADD_PROJECT_FAILED
+			})
+		}
 	
 	
 }

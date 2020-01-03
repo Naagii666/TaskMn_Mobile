@@ -5,7 +5,7 @@ import rootSaga from '../Sagas/'
 import ReduxPersist from '../Config/ReduxPersist'
 import ProfileReducer from '../Containers/Profile/ProfileReducer'
 import ProjectsReducer from '../Containers/Projects/ProjectsReducer'
-import WorkersReducer from '../Containers/Workers/WorkersReducer'
+import WorkersReducer from '../Containers/Search/WorkersReducer'
 import AddProjectReducer from '../Containers/AddProject/AddReducer'
 /* ------------- Assemble The Reducers ------------- */
 export const reducers = combineReducers({

@@ -5,9 +5,10 @@ import _ from 'lodash'
 import { fromJS } from "immutable";
 import {Alert, Modal,ActivityIndicator,H3,View, Text, FlatList, RefreshControl, ScrollView,TouchableHighlight ,Image,StyleSheet, StatusBar, TouchableOpacity,BackHandler} from 'react-native'
 //import all the basic component we have used
-import Icon from 'react-native-vector-icons/FontAwesome'
+import Icon2 from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import moment from 'moment'
-import { Header as Header2 } from 'react-navigation';
+import { Header as Header2 ,NavigationActions} from 'react-navigation';
 import {  Card, ListItem, Button ,Header,Rating } from 'react-native-elements'
 import ViewMoreText from 'react-native-view-more-text';
 // npm install --save react-native-view-more-text 
@@ -32,19 +33,21 @@ class WorkerDetail extends React.Component {
     goBack(){
       this.props.navigation.navigate('Tabs',{
       })
+      // this.props.navigation.goBack()
     }
     renderLeftComponent(){
 		return(
 			<View style={{flex:1}} >
 				<TouchableOpacity 
 						onPress={() => {
-                            this.props.navigation.navigate('Tabs',{
-                      })
+              // this.props.navigation.goBack()
+              this.props.navigation.navigate('Tabs',{
+              })
             }}>
-					<View >
-						<Icon name="chevron-left" size={16} color="#fff"/>
-						{/* <Text style={{color:"#fff", fontSize:10}}>Буцах</Text> */}
-					</View>
+					<View style={{flexDirection:'row'}}>
+              <Icon name="chevron-left" size={16} color="#fff"/>
+              <Text style={{color:'#FFF'}}> Буцах</Text>
+          </View>
 				</TouchableOpacity>
 			</View>
 		)
@@ -141,7 +144,28 @@ class WorkerDetail extends React.Component {
               }
                 
             </View>
+            <View style={{margin:10}}>
+              <Button
+                  icon={
+                    <Icon2
+                      name="ios-chatbubbles"
+                      size={18}
+                      color="white"
+                    />
+                  }
+                  buttonStyle={{
+                    backgroundColor:'#4285F4',
+                  }}
+                  onPress={() => {
+                        this.props.navigation.navigate('MessagesScreen',{ 
+                          item:item
+                      })
+                  }}
+                  title=" Чат бичих"
+                />
+            </View>
           </View>
+          
           <View style={styles.body}>
             <View style={{flex:1,flexDirection:'row', backgroundColor:'dcdcdc',marginVertical:20,marginHorizontal:10,alignContent:'center'}}>
 						  <TouchableHighlight underlayColor="#fff" style={this.state.isWorker?([styles.buttonContainer,styles.isActive]):([styles.buttonContainer])}
@@ -156,11 +180,11 @@ class WorkerDetail extends React.Component {
             {this.state.isWorker ? (
 				        <View style={{marginVertical:20,marginHorizontal:10}}>
                   <View style={{flexDirection:'row',marginTop:10,alignSelf:'center'}}>
-                    <Text style={styles.text}>Үнэлгээ</Text>
+                    <Text style={styles.text}>Үнэлгээ/{item.FLRatings}/</Text>
                     <Rating
                       imageSize={20}
                       readonly
-                      startingValue={4}
+                      startingValue={item.FLRatings}
                     // style={{ styles.rating }}
                     />
                   </View>
@@ -173,11 +197,11 @@ class WorkerDetail extends React.Component {
               ):(
                 <View style={{marginVertical:20,marginHorizontal:10}}>
                   <View style={{flexDirection:'row',marginTop:10,alignSelf:'center'}}>
-                    <Text style={styles.text}>Үнэлгээ</Text>
+                    <Text style={styles.text}>Үнэлгээ/{item.ORatings}/</Text>
                     <Rating
                       imageSize={20}
                       readonly
-                      startingValue={5}
+                      startingValue={item.ORatings}
                     // style={{ styles.rating }}
                     />
                   </View>
@@ -227,7 +251,7 @@ const styles = StyleSheet.create({
     fontWeight:'600',
   },
   infoView:{
-    width:'70%',
+    width:'80%',
     alignSelf:'center',
     flexDirection:'row', 
     justifyContent:'space-between' 

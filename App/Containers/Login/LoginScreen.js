@@ -4,24 +4,34 @@ import {
     Text, 
     Image, 
     View, 
+    KeyboardAvoidingView,
+    Button, 
     TextInput,
+    TouchableHighlight,
     TouchableOpacity, 
     StyleSheet,
     Alert,
     ActivityIndicator,
+    AsyncStorage,
+    ImageBackground,
+    
 } from 'react-native'
 import { Row, H2, H3, H4,H5, Wrapper, Separator } from '../../Components'
 import Icon from 'react-native-vector-icons/Entypo'
-// import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
-import SplashScreen from 'react-native-smart-splash-screen'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import axios from 'axios'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 import _ from 'lodash'
 import {Overlay } from 'react-native-elements'
+import SplashScreen from 'react-native-smart-splash-screen'
 import { setAuthenticationToken,getAuthenticationToken  } from '../../Services/storage'
+//import PushNotification from 'react-native-push-notification';
+//import PushNotificationAndroid from 'react-native-push-notification'
 import { Images } from '../../Themes'
 
 class LoginScreen extends Component {
+
   constructor(props){
     super(props)
     this.state = {
@@ -31,102 +41,164 @@ class LoginScreen extends Component {
       userData: {},
       isVisible : false,
       isLoading: false,
-    }  
-  }
-    componentDidMount () {
-        getAuthenticationToken()
-        .then(token => {
-            if(token) {
-                return this.props.navigation.navigate('Tabs',{
-                })
-            }
-        }) 
-        // this.props.navigation.navigate('Tabs',{
-        // })
-        SplashScreen.close({
-            animationType: SplashScreen.animationType.scale,
-            duration: 1000,
-            delay: 500,
-        })
-    }
-    forgotClicked(){
-		  this.setState({isVisible: true});
-	  }
-    forgetPassword(){
-        Alert.alert('Мэдэгдэл','Нууц үг солигдлоо.Та мэйл хаягаа шалгана уу!')
-    }
-    loginClicked(){
-        let error = this.isValid()
-        if(error)
-            return
-        else{
-            // this.setState({isLoading: true})
-            this._onLoginFunction()
-        }
-    }
-    isValid(){
-        let { email ,password } = this.state
-        if(!email) {
-            alert('Мэйл хаягаа оруулна уу')
-            return true
-        }
-        if(!password) {
-            alert('Нууц үг оруулна уу')
-            return true
-        }
-        return false
-    }
-    _onLoginFunction = () => {
-        axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-        // var form = new FormData();
-        // form.append("UserName", this.state.email);
-        // form.append("Password", this.state.password);
-        // form.append("grant_type", 'password');
 
-        const data = `grant_type=password&UserName=${this.state.email}&Password=${this.state.password}`;   
-        axios.post('https://taskmobile.conveyor.cloud/token', data)
-        .then(response => {
-            this.setState({isLoading: false})
-        if(response.data.access_token!=null) {
-            let token = response.data.access_token.toString();
-            setAuthenticationToken(token);
-            let userData = {
-                auth_token: token,
-            }
-            let appState = {
-                isLoggedIn: true,
-                userData: userData
-            }
-            this.setState({
-                isLoggedIn: appState.isLoggedIn,
-                isLoading: true
-                //user: appState.user
-            })
-            
-            if(this.state.isLoggedIn) 
-                    this.props.navigation.navigate('Tabs',{
-                    })
-            else 
-                    Alert.alert("Алдаа", "Хэрэглэгчийн мэйл/нууц үг буруу байна!");
-            
-            } else {
-                Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
-            }
-            }).catch(error => {
-                // alert(error.message)
-                Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
-                console.log(error);
-            });
-        // this.props.navigation.navigate('Tabs',{
-        //                 })
     }
+    
+  }
+  componentDidMount () {
+     getAuthenticationToken()
+      .then(token => {
+          if(token) {
+            return this.props.navigation.navigate('Tabs',{
+            })
+          }else{
+            SplashScreen.close({
+              animationType: SplashScreen.animationType.scale,
+              duration: 850,
+              delay: 500,
+           })
+          }
+      }) 
+      // this.props.navigation.navigate('Tabs',{
+      // })
+     
+  }
+  forgotClicked(){
+		this.setState({isVisible: true});
+	}
+  forgetPassword(){
+    Alert.alert('Мэдэгдэл','Нууц үг солигдлоо.Та мэйл хаягаа шалгана уу!')
+  }
+  loginClicked(){
+    let error = this.isValid()
+    if(error)
+      return
+    else{
+      this.setState({isLoading: true})
+      this._onLoginFunction()
+    }
+  }
+  isValid(){
+    let { email ,password } = this.state
+    if(!email) {
+      Alert.alert('','Мэйл хаягаа оруулна уу!')
+      return true
+    }
+
+    if(!password) {
+      Alert.alert('','Нууц үгээ оруулна уу!')
+      return true
+    }
+    return false
+  }
+ _onLoginFunction = () => {
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    var form = new FormData();
+    form.append("UserName", this.state.email);
+    form.append("Password", this.state.password);
+    form.append("grant_type", 'password');
+    const config = {
+      data: {
+        "UserName": this.state.email,
+        "Password": this.state.password,
+        "grant_type": 'password'
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    }
+    const data = `grant_type=password&UserName=${this.state.email}&Password=${this.state.password}`;   
+    axios.post('https://taskmobile.conveyor.cloud/token', data)
+     .then(response => {
+        this.setState({isLoading: false})
+      //  alert(response)
+       if(response.data.access_token!=null) {
+        let token = response.data.access_token.toString();
+        setAuthenticationToken(token);
+        let userData = {
+           auth_token: token,
+         }
+         let appState = {
+           isLoggedIn: true,
+           userData: userData
+         }
+        this.setState({
+           isLoggedIn: appState.isLoggedIn,
+           isLoading: true
+           //user: appState.user
+         })
+        
+          if(this.state.isLoggedIn) 
+                this.props.navigation.navigate('Tabs',{
+                })
+           else 
+                Alert.alert("Алдаа", "Хэрэглэгчийн мэйл эсвэл нууц үг буруу байна!");
+          
+        } else {
+            Alert.alert("Алдаа", "Хэрэглэгчийн мэйл эсвэл нууц үг буруу байна!");
+          }
+        }).catch(error => {
+            Alert.alert("Алдаа",error.message)
+            // Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
+            console.log(error);
+        });
+        
+    
+         
+  //  axios.post('https://taskmobile.conveyor.cloud/token',config)
+  //    .then(response => {
+  //      if(response.access_token!=null) {
+   //       //console.log(JSON.stringify(response.data.data));
+   //       let token = response.access_token.toString();
+   //       //let customers_id = response.data.data.customers_id.toString();
+   //       //let customers_picture = response.data.data.picture;
+   //       //let customer_name = response.data.data.user_name;
+
+   //       // let userData = {
+   //       //   name: response.data.data.name,
+   //       //   email: response.data.data.email,
+   //       //   auth_token: token,
+   //       //   customers_id: customers_id
+   //       // }
+
+   //       //console.log('login userData ' + JSON.stringify(userData))
+   //       setAuthenticationToken(token)
+   //       //setCustomerId(customers_id)
+
+   //       let appState = {
+   //         isLoggedIn: true,
+   //         userData: userData
+   //       }
+
+   //       this.setState({
+   //         isLoggedIn: appState.isLoggedIn,
+   //         //user: appState.user
+   //       });
+
+   //       if(this.state.isLoggedIn) {
+   //         this.props.navigation.navigate('Tabs',{
+   //           //url: customers_picture,
+   //           //name: customer_name
+   //         })
+    //      } else {
+    //        Alert.alert("Алдаа", "Хэрэглэгчийн мэйл/нууц үг буруу байна!");
+    //      }
+    //    }
+    //    else{
+    //      Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
+    //    }
+    //  }).catch(error => {
+    //      alert(error.message)
+    //      console.log(error);
+    //  });
+  }
 render() {
     return (
         <ScrollView style={Loginstyles.container}>
           <Overlay
             isVisible={this.state.isVisible}
             width="80%"
-            height="50%"
+            height={250}
   					onBackdropPress={() => this.setState({ isVisible: false })}
 				>
           <View style={{flex:1}}>
