@@ -9,7 +9,7 @@ import HTML from 'react-native-render-html';
 import ImageView from 'react-native-image-view';
 import { onDeleteProject ,getUserProjects ,getMilestones} from './ProjectsActions'
 import { getAllWorkers } from '../Search/WorkersActions'
-class PendingProject extends React.Component {  
+class FinishedProject extends React.Component {  
     componentDidMount() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
         const item = this.props.navigation.getParam('item', []);
@@ -193,35 +193,48 @@ class PendingProject extends React.Component {
                     {this.renderSeparator()}
                     <View style={{marginVertical:10}}>
                         <Text style={{color:'#4285F4'}}>
-                            Саналын мэдээлэл
+                            Санал
                         </Text>
                     </View>
-                    <View style={{flex:1}}>
-                        <View style={{margin:10}}>
-                            <Button
-                                icon={
-                                <Icon
-                                    name="inbox"
-                                    size={18}
-                                    color="white"
-                                />
-                                }
-                                buttonStyle={{
-                                backgroundColor:'#4285F4',
-                                }}
-                                onPress={() => {
-                                    this.props.navigation.navigate('ChooseBid', {
-                                        id:item.ID
-                                    })
-                                }}
-                                title=" Ирсэн саналууд"
-                            />
+
+                    <View style={{justifyContent:'space-between',flexDirection:'column',borderWidth:1,borderColor:'#4285F4',borderRadius:10,margin:5,backgroundColor:'#E7EBF1'}}>
+                    <View style={styles.body}>
+                        <View style={styles.container}>
+                            <Text style={styles.userInfo}>Хугацаа :</Text>
+                            <Text style={styles.titleInfo}>{item.Time + ' хоног'}</Text>
                         </View>
+
+                        <View style={styles.container}>
+                            <Text style={styles.userInfo}>Үнэийн санал :</Text>
+                            <Text style={styles.titleInfo}>{item.Cap+' ₮'}</Text>
+                        </View>
+
+                        {/* <View style={styles.container}>
+                            <Text style={styles.titleInfo}>Төлөв :</Text>
+                            <Text style={styles.titleInfo}>{item.Status + ' хоног'}</Text>
+                        </View> */}
+
+                        <View style={styles.container}>
+                            <Text style={styles.userInfo}>Тайлбар :</Text>
+                            <Text adjustsFontSizeToFit={true} style={[styles.titleInfo,{flex:1 , marginLeft:'10%',textAlign:'right'}]}>{item.BidDescription}</Text>
+                        </View>
+                        
+                        {/* <View style={styles.container}>
+                            <Text style={styles.titleInfo}>Гүйцэтгэгч :</Text>
+                            <TouchableOpacity 
+                                    onPress={() => this.navigateDetail(this.findUser(item.LancerID))}
+                            >
+                                    <Text style={{fontSize:18,color:'#3389ff'}}>
+                            {this.findUserName(item.LancerID)}
+                            </Text>
+                            </TouchableOpacity>
+                        </View> */}
+                    </View>
                     </View>
                         {this.renderSeparator()}
                         <View style={{marginVertical:10}}>
                             <Text style={{color:'#4285F4'}}>
-                                Гүйцэтгэлийг үнэлэх
+                                Захиалагчийг үнэлэх
                             </Text>
                         </View>
                         <View style={[styles.container,{justifyContent:'space-between'}]}>
@@ -295,7 +308,7 @@ export default connect(
             getMilestones:  bindActionCreators(getMilestones, dispatch),
         }
     }
-)(PendingProject);;
+)(FinishedProject);;
 const styles = StyleSheet.create({
   headerTitle: {
     color: '#fff',
@@ -355,6 +368,13 @@ const styles = StyleSheet.create({
     justifyContent:'space-between',
     flex:1,
     marginTop:10
+  },
+  body: {
+    backgroundColor:'#E7EBF1',
+    margin:10,
+    // borderBottomWidth:1, 
+    borderColor:'#4285F4',
+    marginBottom:10
   },
   textInput:{
     width:'80%',

@@ -15,6 +15,7 @@ import { getUserAvatar } from './GithubSagas'
 import projectsSaga from '../Containers/Projects/ProjectsSaga'
 import profileSaga from '../Containers/Profile/ProfileSaga'
 import workersSaga from '../Containers/Search/WorkersSaga'
+import chatSaga from '../Containers/Messenger/ChatSaga'
 import addProjectSaga from '../Containers/AddProject/AddSaga'
 
 /* ------------- API ------------- */
@@ -30,7 +31,8 @@ export default function * root () {
   	fork(projectsSaga),
   	fork(profileSaga),
   	fork(workersSaga),
-  	fork(addProjectSaga),
+    fork(addProjectSaga),
+    fork(chatSaga),
     // some sagas only receive an action
     takeLatest(StartupTypes.STARTUP, startup),
 

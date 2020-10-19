@@ -640,16 +640,26 @@
 import React,{Component} from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux'
-import { Text, View, TouchableOpacity, StyleSheet ,ScrollView,Dimensions,BackHandler,Alert} from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet ,ScrollView,Dimensions,BackHandler,Alert,Image,TextInput ,ActivityIndicator} from 'react-native';
 import {  Card, ListItem, Button ,Header} from 'react-native-elements'
 import { Header as Header2 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import HTML from 'react-native-render-html';
 import ImageView from 'react-native-image-view';
-import { onDeleteProject ,getUserProjects} from './ProjectsActions'
+import { onDeleteProject ,getUserProjects , onSubmitPayment ,onCheckPayment} from './ProjectsActions'
 class ProjectDetail extends React.Component {   
+    constructor(props) {
+		super(props);
+			this.state = {
+                isImageViewVisible:false,
+                amount : ''
+			};
+	}
     componentDidMount() {
+        const item = this.props.navigation.getParam('item', []);
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+        this.props.onCheckPayment(item.ID)
+        // alert(item.ID)
       }
     componentWillUnmount(){
         this.backHandler.remove()
@@ -660,9 +670,14 @@ class ProjectDetail extends React.Component {
     }
     goBack(){
         this.setState({bidView: false});
+        this.props.navigation.pop(),
         this.props.navigation.navigate('Tabs',{
         })
     } 
+    SubmitPayment(PID){
+        this.state.amount==''?Alert.alert('Алдаа', 'Баталгаажуулах дүнг оруулна уу!'):
+        this.props.onSubmitPayment(this.state.amount , PID)
+    }
     deleteProject(ID){
 	    Alert.alert(
             '',
@@ -675,7 +690,7 @@ class ProjectDetail extends React.Component {
                 },
                 {text: 'Тийм', onPress: () => {
                     this.props.onDeleteProject(ID),
-                    this.props.getUserProjects()
+                    this.props.navigation.pop()
                     this.props.navigation.navigate('Tabs',{
                     })
                 }},
@@ -688,6 +703,7 @@ class ProjectDetail extends React.Component {
 			<View style={{flex:1}} >
 				<TouchableOpacity 
 						onPress={() => {
+                            this.props.navigation.pop(),
                             this.props.navigation.navigate('Tabs',{
                       })
                 }}>
@@ -711,8 +727,18 @@ class ProjectDetail extends React.Component {
 		);
 	};
     render() {
-        const { navigation } = this.props;
+        const { navigation ,loading2 ,loading3, payment} = this.props;
         const item = navigation.getParam('item', []);
+        const images = [
+            {
+                source: {
+                    uri: item.Picture?'http://task.mn/'+item.Picture:null,
+                },
+                title: 'Project picture',
+                width: 806,
+                height: 720,
+            },
+        ];
         return(
         <View style={{flex:1}}>
             <Header
@@ -735,10 +761,65 @@ class ProjectDetail extends React.Component {
                             Эхлэх хугацаа : <Text style={{color:'black'}} >{item.StartDate}</Text>
                         </Text>
                         <Text style={{color:'#4285F4'}}>
-                            Саналын тоо: <Text style={{color:'black'}} >{item.AllowBidNumber?item.AllowBidNumber:'0'}</Text>
+                            Саналын тоо: <Text style={{color:'black'}} >{item.AllowBidNumber}</Text>
+                        </Text>
+                        <Text style={{color:'#4285F4'}}>
+                            Үргэлжилэх хугацаа: <Text style={{color:'black'}} >{item.Duration}</Text>
                         </Text>
                     </View>
+                    {this.renderSeparator()}
+                    {loading2?
+                        <ActivityIndicator/>
+                    :payment!='0'?
+                        <View style={{marginVertical:10}}>
+                            <Text style={{color:'#4285F4',}}>Төлбөр баталгаажуулсан дүн</Text>
+                            <Text style={{fontSize:18,color:'black',marginTop:5,}}>
+                                {payment}₮
+                            </Text>
+                        </View>
+                    :
+                    <View style={{flex:1}}>
+                        <Text style={{color:'#4285F4',}}>Төлбөр баталгаажуулах</Text>
+                        <View style={{ flexDirection:'row'}}>
+                            {/* <Text style={{color:'#4285F4',}}>Баталгаажуулах дүн : </Text> */}
+                            <TextInput style={styles.inputs}
+                                placeholder="Баталгаажуулах дүн"
+                                keyboardType="numeric"
+                                value={this.state.amount}
+                                underlineColorAndroid='transparent'
+                                onChangeText={amount => this.setState({amount})}
+                            />
+                        
+                            <View style={{margin:10,alignItems:'center',alignSelf:'center'}}>
+                                <Button
+                                    icon={
+                                        <Icon
+                                        name="check"
+                                        size={18}
+                                        color="white"
+                                        />
+                                    }
+                                    buttonStyle={{
+                                        backgroundColor:'#4285F4',
+                                        alignSelf:'center'
+                                        // width:'50%'
+                                    }}
+                                    onPress={() => {
+                                        // this.props.navigation.navigate('ChooseBid', {
+                                        //     id:item.ID
+                                        // })
+                                        this.SubmitPayment(item.ID)
+                                        // alert(this.state.amount)
+                                    }}
+                                    title=" Батлах"
+                                />
+                            </View>
+                        </View>
+                    </View>
+                    }
+                    {this.renderSeparator()}
                     <View style={{marginVertical:10}}>
+                        <Text style={{color:'#4285F4',}}>Дэлгэрэнгүй мэдээлэл</Text>
                         <HTML html={item.Description} imagesMaxWidth={Dimensions.get('window').width} baseFontStyle={{color:'black'}}/>
                             {/* {item.Description.replace(regex, '')} */}
                         
@@ -763,7 +844,42 @@ class ProjectDetail extends React.Component {
                         </View>
                     </View>
                     {this.renderSeparator()}
+                    <View style={{marginVertical:10}}>
+                        
+                        <Text style={{color:'#4285F4'}}>
+                                Зураг 
+                            </Text>
+                        </View>
+                        <View style={{marginBottom:50,width: 100, height: 100}}>
+                        {item.Picture?
+                                <TouchableOpacity style={{flex:1}} onPress={() =>  this.setState({ isImageViewVisible: true })}>
+                                    <Image
+                                        style={{width: 100, height: 100}}
+                                        source={{uri: 'http://task.mn/'+item.Picture}}
+                                    />
+                                </TouchableOpacity>
+                                
+                        :(
+                            <View StyleSheet={{alignSelf:'center',alignContent:'center'}}>
+                                <Text style={{fontSize:14,color:"#3C4348",fontWeight:'300',alignSelf:'center'}}>
+                                    Зураг байхгүй
+                                </Text>
+                            </View>
+                        )}
+                    </View> 
+                    <ImageView
+                        images={images}
+                        imageIndex={0}
+                        isSwipeCloseEnabled={true}
+                        isPinchZoomEnabled={true}
+                        isTapZoomEnabled={true}
+                        isVisible={this.state.isImageViewVisible}
+                        onClose = {() =>  this.setState({ isImageViewVisible: false })}
+                        // renderFooter={(currentImage) => (<View><Text>My footer</Text></View>)}
+                    />
+                    {/* {this.renderSeparator()} */}
                 </View>
+                
             </ScrollView>
             <View style={styles.constContainer}>
                 <TouchableOpacity style={[styles.deleteButton]} 
@@ -793,14 +909,18 @@ export default connect(
     state => ({
             loading: state.project.getIn(['on_delete_project', 'loading']),
                 // projects: state.project.getIn(['project_list', 'data']).toJS(),
+            loading2: state.project.getIn(['check_payment', 'loading']),
+            payment: state.project.getIn(['check_payment', 'data']),
     }),
     dispatch => {
         return {
             onDeleteProject: bindActionCreators(onDeleteProject, dispatch),
             getUserProjects: bindActionCreators(getUserProjects, dispatch),
+            onSubmitPayment: bindActionCreators(onSubmitPayment, dispatch),
+            onCheckPayment: bindActionCreators(onCheckPayment, dispatch),
         }
     }
-)(ProjectDetail);;
+)(ProjectDetail);
 const styles = StyleSheet.create({
   headerTitle: {
     color: '#fff',
@@ -833,6 +953,14 @@ const styles = StyleSheet.create({
     borderRadius:10,
     marginHorizontal:'5%',
     marginVertical:5
+  },
+  inputs:{
+    borderColor:'#4285F4',
+    borderWidth:1,
+    width:'50%',
+    height:45,
+    marginVertical:10,
+    alignSelf:'center'
   },
   constContainer:{
     left:0,

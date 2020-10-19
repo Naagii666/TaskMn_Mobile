@@ -573,7 +573,6 @@ class AddView extends Component {
 			/>
 		);
 	};
-  keyExtractor = (item, index) => index.toString();
   renderItem = ({ item }) => (
     <View style={{justifyContent:'space-between',flexDirection:'column',marginHorizontal:10}}>
       <TouchableOpacity style={{width:'100%',justifyContent:'space-between',flexDirection:'row'}}
@@ -584,9 +583,13 @@ class AddView extends Component {
           }
         )}}>
         <View style={{width:'90%'}}>
-          <Text style={{color:'#4285F4',fontSize:20,fontWeight:'600'}}>
-            {item.TypeName}
+          <Text style={{color:'#2D3954',fontSize:20,fontWeight:'bold'}}>
+          {item.TypeName}
           </Text>
+          <Text numberOfLines={3} style={{fontSize:14 , textAlign:'justify',color:'#69d275'}}>
+            {item.TypeDescription}
+          </Text>
+          
         </View>
         <View style={{alignSelf:'center'}}>
           <Icon name="chevron-right" size={16} color="#4285F4"/>
@@ -602,7 +605,7 @@ class AddView extends Component {
   render() {
     const {types ,loading} = this.props
     return(
-      <View>
+      <View style={styles.body}>
         <Header
           containerStyle={{
             height:Header2.HEIGHT,
@@ -612,25 +615,26 @@ class AddView extends Component {
         //   centerComponent={{ text: 'Миний ажлууд', style: { color: '#fff' } }}
         //   rightComponent={{ icon: 'home', color: '#fff' }}
         />
-        <View>
+        <View style={styles.container}>
           {loading?
-          <ActivityIndicator/>
+            <ActivityIndicator/>
           :(
             <FlatList
-						refreshControl={
-							<RefreshControl
-								refreshing={loading}
-								onRefresh={this._onRefresh.bind(this)}
-							/>
-						}
-						keyExtractor={this.keyExtractor}
-						ItemSeparatorComponent={this.renderSeparator}
-						data={types}
-						renderItem={this.renderItem}
-						ListEmptyComponent={
-							<this.EmptyComponent title="Хоосон" />
-						}
-					/>
+              refreshControl={
+                <RefreshControl
+                  refreshing={loading}
+                  onRefresh={this._onRefresh.bind(this)}
+                />
+              }
+              keyExtractor={item => item.TypeID}
+              ItemSeparatorComponent={this.renderSeparator}
+              data={types}
+              style={styles.flatList}
+              renderItem={this.renderItem}
+              ListEmptyComponent={
+							  <this.EmptyComponent title="Категори олдсонгүй." />
+						  }
+					  />
           )
           }
         
@@ -647,11 +651,14 @@ export default connect(
   dispatch => {
     return {
       getProjectTypes: bindActionCreators(getProjectTypes, dispatch),
-      //navigate: bindActionCreators(NavigationActions.navigate, dispatch),
     }
   }
 )(AddView)
 const styles = StyleSheet.create({
+  body:{
+		backgroundColor:'#FFF',
+    height:'100%',
+	},
   headerTitle: {
     color: '#fff',
     alignSelf:'center',
@@ -665,5 +672,9 @@ const styles = StyleSheet.create({
 	},
 	emptyText:{
 		color:'#4285F4'
-	}
+  },
+  container:{
+		backgroundColor:'#FFF',
+    flex:1
+  },
 })

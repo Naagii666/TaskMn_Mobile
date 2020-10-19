@@ -6,7 +6,8 @@ import { Header as Header2 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import HTML from 'react-native-render-html';
 import ImageView from 'react-native-image-view';
-import { addProject } from './AddActions'
+// import { addProject } from './AddActions'
+import { addProject } from '../Projects/ProjectsActions'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
@@ -31,6 +32,7 @@ class NewProject extends React.Component {
           TypeID:'',
           startDate:'',
           duration:'',
+          height :0
           // text:'',
         }
     }
@@ -42,10 +44,29 @@ class NewProject extends React.Component {
     }
     componentWillUnmount(){
       this.backHandler.remove()
+      this.clearText()
     }
     handleBackPress = () => {
       this.goBack(); // works best when the goBack is async
+      this.clearText()
       return true;
+    }
+    componentWillMount(){
+      this.clearText()
+    }
+    clearText(){
+      this.setState({
+        name : '',
+        description   : '',
+        lowPrice: '',
+        highPrice: '',
+        loading: false,
+        photo: [],
+        TypeID:'',
+        startDate:'',
+        duration:'',
+        height :0
+      })
     }
     goBack(){
       this.props.navigation.navigate('Tabs',{
@@ -59,7 +80,8 @@ class NewProject extends React.Component {
       // const TypeID = navigation.getParam('TypeID', []);
       this.setState({TypeID: id});
       this.props.addProject(this.state)
-      this.props.navigation.navigate('Tabs',{
+      this.props.navigation.pop()
+      this.props.navigation.navigate('Projects',{
       })
     }
     launchImageLibrary = () => {
@@ -86,6 +108,7 @@ class NewProject extends React.Component {
           photo.push(response)
           this.forceUpdate()
         }
+        // alert(this.state.photo[0])
       });
   
     }
@@ -130,9 +153,25 @@ class NewProject extends React.Component {
       }
     }
     formValidate() {
-      let { name ,startDate,TypeID } = this.state
+      let { name ,startDate,TypeID ,duration,lowPrice,highPrice,description} = this.state
       if(!name) {
         Alert.alert('','Ажлын нэрийг оруулна уу!')
+        return true
+      }
+      if(!duration) {
+        Alert.alert('','Үргэлжилэх хугацааг оруулна уу!')
+        return true
+      }
+      if(!lowPrice) {
+        Alert.alert('','Үнийн мэдээллийг оруулна уу!')
+        return true
+      }
+      if(!highPrice) {
+        Alert.alert('','Үнийн мэдээллийг оруулна уу!')
+        return true
+      }
+      if(!description) {
+        Alert.alert('','Ажлын дэлгэрэнгүйг оруулна уу!')
         return true
       }
       if(!startDate) {
@@ -146,6 +185,7 @@ class NewProject extends React.Component {
 			<View style={{flex:1}} >
 				<TouchableOpacity 
 						onPress={() => {
+              this.clearText(),
                             this.props.navigation.navigate('Tabs',{
                       })
                 }}>
@@ -198,6 +238,7 @@ class NewProject extends React.Component {
                       style={styles.inputs}
                       keyboardType='default'
                       placeholder="Ажлын нэр"
+                      value={this.state.name}
                       underlineColorAndroid='transparent'
                       // maxLength={8}
                       onChangeText={name => this.setState({name})}
@@ -211,15 +252,18 @@ class NewProject extends React.Component {
               </Text>
             </View>
 
-            <View style={{alignContent:'center',marginHorizontal:10}}>
-              <View style={styles.inputContainer}>    
-                  <TextInput style={styles.inputs}
-                      numberOfLines={10}
+            <View style={{alignContent:'center',marginHorizontal:10,flex:1}}>
+              <View style={styles.inputContainer2}>    
+                  <TextInput style={styles.inputs,{height: Math.max(45, this.state.height)}}
+                      numberOfLines={5}
                       placeholder="Ажлын дэлгэрэнгүйг оруулна"
                       ellipsizeMode="head"
                       keyboardType="default"
+                      onContentSizeChange={(event) => {
+                        this.setState({ height: event.nativeEvent.contentSize.height<100?event.nativeEvent.contentSize.height:100 })
+                      }}
                       multiline={true}
-                      // value={this.state.firstName}
+                      value={this.state.description}
                       underlineColorAndroid='transparent'
                       onChangeText={description => this.setState({description})}
                   />
@@ -238,6 +282,7 @@ class NewProject extends React.Component {
                   <TextInput style={styles.inputs}
                       placeholder="Доод үнэ"
                       keyboardType="numeric"
+                      value={this.state.lowPrice}
                       // value={this.state.firstName}
                       underlineColorAndroid='transparent'
                       onChangeText={lowPrice => this.setState({lowPrice})}
@@ -255,6 +300,7 @@ class NewProject extends React.Component {
                   <TextInput style={styles.inputs}
                       placeholder="Дээд үнэ"
                       keyboardType="numeric"
+                      value={this.state.highPrice}
                       // value={this.state.firstName}
                       underlineColorAndroid='transparent'
                       onChangeText={highPrice => this.setState({highPrice})}
@@ -280,6 +326,7 @@ class NewProject extends React.Component {
                   <TextInput style={styles.inputs}
                       placeholder="HTML , PHP , Англи хэл ..."
                       ellipsizeMode="head"
+                      value={this.state.skills}
                       keyboardType="default"
                       // value={this.state.firstName}
                       underlineColorAndroid='transparent'
@@ -301,7 +348,7 @@ class NewProject extends React.Component {
                   <TextInput style={styles.inputs}
                       placeholder="120 , 6 ..."
                       keyboardType="numeric"
-                      // value={this.state.phone}
+                      value={this.state.duration}
                       underlineColorAndroid='transparent'
                       onChangeText={duration => this.setState({ duration })}
                   />
@@ -387,11 +434,17 @@ class NewProject extends React.Component {
           </View>
         </KeyboardAwareScrollView>
         <View style={styles.constContainer}>
-          <TouchableOpacity style={[styles.bidButton]} 
+          {/* <TouchableOpacity style={[styles.bidButton]} 
                   onPress={() => this.InsertProject(id)}
           >
               <Text style={styles.bidText}>+ Ажил нэмэх</Text>
+          </TouchableOpacity> */}
+          <TouchableOpacity style={[styles.bidButton,{ alignContent:'center' , flex:1,alignItems:'center'}]} 
+                        onPress={() => this.InsertProject(id)}
+                    >
+                      <Text style={styles.bidText}>+ Ажил нэмэх</Text>
           </TouchableOpacity>
+          
         </View> 
     </View>
       
@@ -401,8 +454,8 @@ class NewProject extends React.Component {
 }
 export default connect(
   state => ({
-        loading: state.addProject.getIn(['project_list', 'loading']),
-        project: state.addProject.getIn(['project_list', 'data']),
+        // loading: state.addProject.getIn(['project_list', 'loading']),
+        // project: state.addProject.getIn(['project_list', 'data']),
   }),
   dispatch => {
     return {
@@ -475,14 +528,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems:'center',
   },
+  inputContainer2: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: "#4285F4",
+    width:'90%',
+    height:100,
+    maxHeight:200,
+    marginBottom:20,
+    flexDirection: 'row',
+    alignItems:'center',
+    flex:1
+  },
   inputs:{
     height:45,
+    maxHeight:200,
     marginLeft:16,
     borderBottomColor: '#FFFFFF',
-    flex:1,
+    // flex:1,
     maxHeight:200
     
   },
+  
   backButton:{
     backgroundColor:'#f28787',
     alignContent:'center',
@@ -497,39 +564,24 @@ const styles = StyleSheet.create({
     borderWidth:1,
     borderColor:'#ec7a73'
     },
-  constContainer:{
-    left:0,
-    right:0,
-    bottom:0,
-    width:'100%',
-    height:'10%',
-    backgroundColor:'#fff',
-    borderTopWidth:1,	
-    borderTopColor:'#DB4437',
-    // flexDirection:'row',
-    alignSelf:'center',
-    marginVertical:10,
-    flexDirection:'row',
-    justifyContent:'center'
-    },
+  // constContainer:{
+  //   left:0,
+  //   right:0,
+  //   bottom:0,
+  //   width:'100%',
+  //   height:'10%',
+  //   backgroundColor:'#fff',
+  //   borderTopWidth:1,	
+  //   borderTopColor:'#DB4437',
+  //   // flexDirection:'row',
+  //   alignSelf:'center',
+  //   marginVertical:10,
+  //   flexDirection:'row',
+  //   justifyContent:'center'
+  //   },
   btnText: {
     textAlign: 'center',
     color: '#4285F4',
     fontSize: 14,
   },
-  bidButton:{
-    backgroundColor:'#69d275',
-    alignContent:'center',
-    justifyContent: 'center',
-    width:'50%',
-    // alignSelf:'center',
-    // marginLeft:'10%',
-    borderRadius:10,
-    height:'70%',
-    marginTop:10,
-    justifyContent:'center',
-    borderWidth:1,
-    borderColor:'#27b737'
-    },
-
 })

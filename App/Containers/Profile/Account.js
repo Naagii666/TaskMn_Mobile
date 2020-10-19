@@ -3,13 +3,22 @@ import React,{Component} from 'react';
 import { Text, View, TouchableOpacity, StyleSheet,ActivityIndicator,FlatList ,RefreshControl ,BackHandler } from 'react-native';
 import {  Card, ListItem, Button ,Header ,SearchBar} from 'react-native-elements'
 import { Header as Header2 } from 'react-navigation';
-import { getAllWorkers } from '../Search/WorkersActions'
+import { getProfile, getBalance , getTransaction } from './ProfileActions'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux'
-
+// ID
+// Date
+// Time
+// TransactionValue  
+// BeforeBalance
+// Value
+// AfterBalance
+// Account  
 class Account extends React.Component {
     componentDidMount() {
+        this.props.getBalance(),
+        this.props.getTransaction(),
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
       }
     componentWillUnmount(){
@@ -21,6 +30,7 @@ class Account extends React.Component {
     }
     goBack(){
         this.setState({bidView: false});
+        this.props.navigation.pop(),
         this.props.navigation.navigate('Tabs',{
         })
     } 
@@ -29,6 +39,7 @@ class Account extends React.Component {
 			<View style={{flex:1}} >
 				<TouchableOpacity 
 						onPress={() => {
+                            this.props.navigation.pop(),
                             this.props.navigation.navigate('Tabs',{
                       })
                 }}>
@@ -40,6 +51,11 @@ class Account extends React.Component {
 			</View>
         )
     }
+    keyExtractor = (item, index) => index.toString();
+	_onRefresh() {
+		this.props.getTransaction()
+    }
+    
     renderSeparator = () => {
 		return (
 			<View
@@ -50,10 +66,29 @@ class Account extends React.Component {
   						}}
 			/>
 		);
-	};
+    };
+    accountNumber = () => {
+        return(
+                <Text style={{color:'#27B737'}}>
+                    {' '}5022781276{' '}
+                </Text> 
+        )
+    }
+    EmptyComponent = ({ title }) => (
+		<View style={styles.emptyContainer}>
+		  <Text style={styles.emptyText}>{title}</Text>
+		</View>
+    );
+    renderItem = ({ item }) => (
+        <View style={{flexDirection:'row'}}>
+            <Text>{item.Account}</Text>
+        </View>
+      );
+  
     render() {
-        const { navigation } = this.props;
+        const { navigation ,balance, loading ,loading2 , transaction} = this.props;
         const item = navigation.getParam('item', []);
+        const code = navigation.getParam('pCode', []);
         return(
         <View>
             <Header
@@ -70,7 +105,7 @@ class Account extends React.Component {
                 </Text>
                 <View style={{flexDirection:'row',marginVertical:10}}>
                     <Text style={{color:'#3c4348',textAlign:'justify' , fontSize:16}}>
-                        Хаан Банкны 5022781276 данс руу цэнэглэх мөнгөө шилжүүлнэ. Гүйлгээний утга дээр бүртгүүлсэн утасны дугаараа бичнэ.
+                        Хаан Банкны {this.accountNumber()} данс руу цэнэглэх мөнгөө шилжүүлнэ. Гүйлгээний утга дээр бүртгүүлсэн утасны дугаараа бичнэ.
                     </Text>
                     {/* <Text style={{color:'#27B737'}}>
                     {' '}5022781276{' '}
@@ -87,6 +122,52 @@ class Account extends React.Component {
                         {' '}{item}{' '}
                     </Text> 
                 </View>
+                <View style={{flexDirection:'row',marginVertical:10}}>
+                    <Text style={{color:'#3c4348', fontSize:16}}>
+                        Төлбөрийн код : 
+                    </Text>  
+                    <Text style={{color:'#F33066',fontSize:16}}>
+                        {' '}{code}{' '}
+                    </Text> 
+                </View>
+                <View style={{flexDirection:'row',marginVertical:10}}>
+                <Text style={{color:'#3c4348', fontSize:16}}>
+                        Дансны үлдэгдэл : 
+                    </Text>  
+                    {loading?<ActivityIndicator/>:
+                        <Text style={{color:'#27B737',fontSize:16}}>
+                            {' '}{balance.Amount}{' ₮'}
+                        </Text> 
+                    }
+                </View>
+                {this.renderSeparator()}
+                <View style={{alignItems:'center',justifyContent:'center',marginVertical:10}}>
+                    <Text style={{color:'#2D3954',fontSize:18,fontWeight:'bold',alignSelf:'center'}}>
+                        Дансны хуулга 
+                    </Text>  
+                </View>
+                {this.renderSeparator()}
+                <View>
+                  {loading2?
+                    <ActivityIndicator />
+                  :(
+                    <FlatList
+                      refreshControl={
+                        <RefreshControl
+                          refreshing={loading}
+                          onRefresh={this._onRefresh.bind(this)}
+                        />
+                      }
+                      keyExtractor={item => item.Account}
+                      // ItemSeparatorComponent={this.renderSeparator}
+                      data={transaction}
+                      renderItem={this.renderItem}
+                      ListEmptyComponent={
+                        <this.EmptyComponent title="Гүйлгээ хийгдээгүй." />
+                      }
+                    />
+                  )}
+                </View>
                 
             </View>
             
@@ -94,7 +175,20 @@ class Account extends React.Component {
         );
     }
 }
-export default (Account);
+export default connect(
+    state => ({
+     loading: state.profile.getIn(['balance', 'loading']),
+     balance: state.profile.getIn(['balance', 'data']),
+     loading2: state.profile.getIn(['transaction_list', 'loading']),
+     transaction: state.profile.getIn(['transaction_list', 'data']),
+    }),
+    dispatch => {
+      return {
+        getBalance: bindActionCreators(getBalance, dispatch),
+        getTransaction: bindActionCreators(getTransaction, dispatch),
+      }
+    }
+  )(Account);
 const styles = StyleSheet.create({
   headerTitle: {
     color: '#fff',

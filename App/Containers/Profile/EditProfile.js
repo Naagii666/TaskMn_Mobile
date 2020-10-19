@@ -43,7 +43,6 @@ class EditProfile extends React.Component {
 
   change(){
     this.props.editProfile(this.state)
-    this.props.getProfile()
     this.goBack()
   }
   componentWillUnmount(){
@@ -54,6 +53,7 @@ class EditProfile extends React.Component {
     return true;
     }
   goBack(){
+      this.props.navigation.pop(),
       this.props.navigation.navigate('Tabs',{
       })
   }
@@ -70,8 +70,10 @@ class EditProfile extends React.Component {
       <View style={{flex:1}} >
         <TouchableOpacity 
             onPress={() => {
-                            this.props.navigation.navigate('Tabs',{
-                      })
+              this.props.navigation.pop(),
+              this.props.navigation.navigate('Tabs',{
+              })
+              
             }}>
           <View style={{flexDirection:'row'}}>
               <Icon name="chevron-left" size={16} color="#fff"/>
@@ -183,7 +185,20 @@ class EditProfile extends React.Component {
                     onPress={() => {
                           this.change()
                     }}
-                    title=" Засварлах"
+                    title="Засварлах"
+                  />
+                  <Button
+                    buttonStyle={{
+                      borderRadius:10,
+                      width:'90%',
+                      backgroundColor:'#4285F4',
+                      alignSelf:'center',
+                      marginTop:10
+                    }}
+                    onPress={() => {
+                          this.props.navigation.navigate('EditSkills')
+                    }}
+                    title="Ур чадвар"
                   />
               </View>
             </View>

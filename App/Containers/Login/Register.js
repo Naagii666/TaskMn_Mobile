@@ -248,6 +248,8 @@ class Register extends Component {
       switchButton:{
         width:'50%',
         alignItems:'center',
+        alignContent:'center',
+        justifyContent:'center'
       },
       isActive:{
         backgroundColor:'#4285F4',

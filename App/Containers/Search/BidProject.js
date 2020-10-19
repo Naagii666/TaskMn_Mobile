@@ -22,11 +22,10 @@ class BidProject extends React.Component {
         this.setState({projectID:pID})
     }
     BidProject(){
-        this.setID()
+        // this.setID()
         let error = this.formValidate()
         if(error) return
-        alert(this.state.projectID)
-        // this.props.onBidProject(this.state)
+        this.props.onBidProject(this.state)
     }
     setID(){
         const pID = this.props.navigation.getParam('projectID', []);
@@ -42,14 +41,14 @@ class BidProject extends React.Component {
             Alert.alert('','Ажиллах хугацаагаа оруулна уу!')
             return true
         }
+        this.props.navigation.pop()
     }
     renderLeftComponent(){
         return(
             <View style={{flex:1}} >
                 <TouchableOpacity 
                         onPress={() => {
-                            this.props.navigation.navigate('Tabs',{
-                    })
+                            this.props.navigation.pop()
                 }}>
                     <View style={{flexDirection:'row'}}>
                         <Icon name="chevron-left" size={16} color="#fff"/>
@@ -108,29 +107,26 @@ class BidProject extends React.Component {
                         underlineColorAndroid='transparent'
                         onChangeText={(Description) => this.setState({Description})}
                     />
-                        
-                    
-                        <Text  style={styles.formText}>
-                            Чадвар
-                        </Text>
                 </View>
             </View>
             <View style={styles.consContainer}>
-                        <TouchableOpacity style={[styles.comfirmButton,{alignContent:'center',
-                                                    justifyContent: 'center',}]} 
-                                    onPress={() => this.BidProject()}
-                                    >
-                                    <Text style={{color:'#fff',justifyContent:'center',
-                                                    textAlign:'center',}}>Батлах</Text>
-                        </TouchableOpacity>
-                    </View>
+                <Button
+                    buttonStyle={[styles.comfirmButton,{alignContent:'center',
+                    justifyContent: 'center',}]}
+                    onPress={() => {
+                        this.BidProject()
+                    }}
+                    title="Илгээх"
+                  />
+            </View>
         </View>
         );
     }
 }
 export default connect(
 	state => ({
-
+        loading: state.workers.getIn(['bid_project', 'loading']),
+		data: state.workers.getIn(['bid_project', 'data']),
 	}),
 	dispatch => {
 	  return {
@@ -155,7 +151,7 @@ const styles = StyleSheet.create({
     alignSelf:'center'
   },
   comfirmButton:{
-    backgroundColor:'#4285F4',
+    backgroundColor:'#69d275',
     width:'50%',
     height:40,
     borderRadius:5,
@@ -175,6 +171,9 @@ consContainer:{
     // alignSelf:'center'
     position:'absolute',
     flex:0.1,
+},
+formText:{
+   color: '#3C4348'
 }
 
   

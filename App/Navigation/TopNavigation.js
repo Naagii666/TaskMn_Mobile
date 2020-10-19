@@ -15,7 +15,7 @@ export const TopNavigation = createMaterialTopTabNavigator(
   
         ActiveScreen: {
             screen: ActiveScreen,
-            navigationOptions: { header: null, title: 'Харилцагчид' }
+            navigationOptions: { header: null, title: 'Гүйцэтгэгчид' }
         },
     },
     {

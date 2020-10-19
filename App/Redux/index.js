@@ -6,6 +6,7 @@ import ReduxPersist from '../Config/ReduxPersist'
 import ProfileReducer from '../Containers/Profile/ProfileReducer'
 import ProjectsReducer from '../Containers/Projects/ProjectsReducer'
 import WorkersReducer from '../Containers/Search/WorkersReducer'
+import ChatReducer from '../Containers/Messenger/ChatReducer'
 import AddProjectReducer from '../Containers/AddProject/AddReducer'
 /* ------------- Assemble The Reducers ------------- */
 export const reducers = combineReducers({
@@ -15,7 +16,8 @@ export const reducers = combineReducers({
   project: ProjectsReducer,
   profile: ProfileReducer,
   workers: WorkersReducer,
-  addProject: AddProjectReducer
+  addProject: AddProjectReducer,
+  chat: ChatReducer
 })
 
 export default () => {

@@ -3,11 +3,12 @@ import React,{Component} from 'react';
 import { connect } from 'react-redux'
 
 import {bindActionCreators} from 'redux'
-import { Text, View, TouchableOpacity, StyleSheet,FlatList,RefreshControl } from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet,FlatList,RefreshControl ,ActivityIndicator} from 'react-native';
 import {  Card, ListItem, Button ,Header ,SearchBar} from 'react-native-elements'
 import { Header as Header2 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome'
-import { getAllWorkers , getAllProjects ,onBidProject } from './WorkersActions'
+import { getAllWorkers , getAllProjects  } from './WorkersActions'
+// import { ActivityIndicator } from 'react-native-paper';
 
 class SearchView extends React.Component {
   constructor(props) {
@@ -15,7 +16,7 @@ class SearchView extends React.Component {
     this.state = {
       value:'',
       error: null,
-      data: [],
+      data: []
     };
     this.arrayholder = [];
   }
@@ -30,17 +31,22 @@ class SearchView extends React.Component {
 			/>
 		);
 	};
-  componentDidMount() {
+  componentWillMount() {
     this.props.getAllProjects()
+    this.setProjets()
+  }
+  setProjets(){
     const { projects, loading } = this.props
     this.arrayholder = projects
-    this.setState({ data: projects }); 
+    // while(loading){
+    //   console.log('waiting')
+    // }
+    // this.setState({ data: projects });
+    projects[0]==null?this._onRefresh.bind(this):this.setState({ data: projects }); 
   }
   _onRefresh(){
-    const { projects, loading } = this.props
     this.props.getAllProjects()
-    this.arrayholder = projects
-    this.setState({ data: projects }); 
+    this.setProjets()
   }
   searchFilterFunction = text => {
     this.setState({
@@ -70,13 +76,16 @@ class SearchView extends React.Component {
         onChangeText={text => this.searchFilterFunction(text)}
         autoCorrect={false}
         value={this.state.value}
-        containerStyle={styles.SearchBar}
-        inputContainerStyle={styles.SearchBarInput}
       />
     );
   };
+  renderFooter = () => {
+    return (
+      <Text>aa</Text>
+    );
+  };
   renderItem = ({ item }) => (
-    <View style={{justifyContent:'space-between',flexDirection:'column'}}>
+    <View style={{justifyContent:'space-between',flexDirection:'column',margin:10}}>
       <TouchableOpacity style={{width:'100%',justifyContent:'space-between',flexDirection:'row'}}
         onPress={() => {
               this.props.navigation.navigate('WorkDetail', {
@@ -84,10 +93,10 @@ class SearchView extends React.Component {
           }
         )}}>
         <View style={{width:'90%'}}>
-          <Text style={{color:'black',fontSize:20,fontWeight:'bold'}}>
+          <Text style={{color:'#2D3954',fontSize:20,fontWeight:'bold'}}>
             {item.Name}
           </Text>
-          <Text numberOfLines={3} style={{fontSize:14 , textAlign:'justify',color:'#A7A7A7'}}>
+          <Text numberOfLines={3} style={{fontSize:14 , textAlign:'justify',color:'#69d275'}}>
             {item.LowPrice}₮ - {item.HighPrice}₮ / Эхлэхэд өдөр : {item.StartDate}
           </Text>
         </View>
@@ -97,6 +106,31 @@ class SearchView extends React.Component {
       </TouchableOpacity>
     </View>
   )
+  renderList(){
+    const { projects, loading } = this.props
+    return(
+      <View style={styles.container}>
+        <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={loading}
+                onRefresh={this._onRefresh.bind(this)}
+              />
+            }
+            keyExtractor={item => item.ID}
+            // data={userProjects}
+            ItemSeparatorComponent={this.renderSeparator}
+            data={this.state.data}
+            renderItem={this.renderItem}
+            ListHeaderComponent={this.renderHeader}
+            // ListFooterComponent={this.renderFooter}
+            ListEmptyComponent={
+              <this.EmptyComponent title="Мэдээлэл олдсонгүй" />
+            }
+        />
+      </View>
+    )
+  }
   render() {
     const { projects, loading } = this.props
     return(
@@ -110,25 +144,11 @@ class SearchView extends React.Component {
         //   centerComponent={{ text: 'Миний ажлууд', style: { color: '#fff' } }}
         //   rightComponent={{ icon: 'home', color: '#fff' }}
         />
-        <View style={styles.container}>
-          <FlatList
-              refreshControl={
-              	<RefreshControl
-              		refreshing={loading}
-              		onRefresh={this._onRefresh.bind(this)}
-              	/>
-              }
-              keyExtractor={this.keyExtractor}
-              // data={userProjects}
-              ItemSeparatorComponent={this.renderSeparator}
-              data={this.state.data}
-              renderItem={this.renderItem}
-              ListHeaderComponent={this.renderHeader}
-              ListEmptyComponent={
-                <this.EmptyComponent title="Мэдээлэл олдсонгүй" />
-              }
-          />
-        </View>
+        {loading?
+          <ActivityIndicator/>
+        :(
+          this.renderList()
+        )}
       </View>
      );
   }
@@ -155,11 +175,8 @@ const styles = StyleSheet.create({
   },
   body:{
 		backgroundColor:'#FFF',
-		height:'100%'
-	},
-  container:{
-		backgroundColor:'#FFF',
-		margin:10,
+    height:'100%',
+    marginBottom:'10%'
 	},
 	emptyContainer:{
 		alignItems:'center',
@@ -170,7 +187,6 @@ const styles = StyleSheet.create({
   },
   container:{
 		backgroundColor:'#FFF',
-    margin:10,
     flex:1
   },
   SearchBar:{

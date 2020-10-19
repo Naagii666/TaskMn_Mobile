@@ -25,6 +25,7 @@ import {bindActionCreators} from 'redux'
 import _ from 'lodash'
 import {Overlay } from 'react-native-elements'
 import SplashScreen from 'react-native-smart-splash-screen'
+import { getAllWorkers ,getAllProjects} from '../Search/WorkersActions'
 import { setAuthenticationToken,getAuthenticationToken  } from '../../Services/storage'
 //import PushNotification from 'react-native-push-notification';
 //import PushNotificationAndroid from 'react-native-push-notification'
@@ -109,8 +110,9 @@ class LoginScreen extends Component {
     }
     const data = `grant_type=password&UserName=${this.state.email}&Password=${this.state.password}`;   
     axios.post('https://taskmobile.conveyor.cloud/token', data)
+    // axios.post('http://192.168.1.100:45455/token', data)
      .then(response => {
-        this.setState({isLoading: false})
+        
       //  alert(response)
        if(response.data.access_token!=null) {
         let token = response.data.access_token.toString();
@@ -124,73 +126,34 @@ class LoginScreen extends Component {
          }
         this.setState({
            isLoggedIn: appState.isLoggedIn,
-           isLoading: true
+           isLoading: false
            //user: appState.user
          })
         
-          if(this.state.isLoggedIn) 
-                this.props.navigation.navigate('Tabs',{
-                })
-           else 
-                Alert.alert("Алдаа", "Хэрэглэгчийн мэйл эсвэл нууц үг буруу байна!");
+          if(this.state.isLoggedIn) {
+            this.props.navigation.pop(),
+            this.props.getAllProjects(),
+            this.props.getAllWorkers(),
+            this.props.navigation.navigate('Tabs',{
+            })
+            
+          }
+                
+           else {
+              this.setState({isLoading: false})
+              Alert.alert("Алдаа", "Хэрэглэгчийн мэйл эсвэл нууц үг буруу байна!");
+           }
           
         } else {
+            this.setState({isLoading: false})
             Alert.alert("Алдаа", "Хэрэглэгчийн мэйл эсвэл нууц үг буруу байна!");
           }
         }).catch(error => {
-            Alert.alert("Алдаа",error.message)
-            // Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
+            // Alert.alert("Алдаа",error.message)
+            this.setState({isLoading: false})
+            Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
             console.log(error);
         });
-        
-    
-         
-  //  axios.post('https://taskmobile.conveyor.cloud/token',config)
-  //    .then(response => {
-  //      if(response.access_token!=null) {
-   //       //console.log(JSON.stringify(response.data.data));
-   //       let token = response.access_token.toString();
-   //       //let customers_id = response.data.data.customers_id.toString();
-   //       //let customers_picture = response.data.data.picture;
-   //       //let customer_name = response.data.data.user_name;
-
-   //       // let userData = {
-   //       //   name: response.data.data.name,
-   //       //   email: response.data.data.email,
-   //       //   auth_token: token,
-   //       //   customers_id: customers_id
-   //       // }
-
-   //       //console.log('login userData ' + JSON.stringify(userData))
-   //       setAuthenticationToken(token)
-   //       //setCustomerId(customers_id)
-
-   //       let appState = {
-   //         isLoggedIn: true,
-   //         userData: userData
-   //       }
-
-   //       this.setState({
-   //         isLoggedIn: appState.isLoggedIn,
-   //         //user: appState.user
-   //       });
-
-   //       if(this.state.isLoggedIn) {
-   //         this.props.navigation.navigate('Tabs',{
-   //           //url: customers_picture,
-   //           //name: customer_name
-   //         })
-    //      } else {
-    //        Alert.alert("Алдаа", "Хэрэглэгчийн мэйл/нууц үг буруу байна!");
-    //      }
-    //    }
-    //    else{
-    //      Alert.alert("Алдаа", "Хэрэглэгчийн имэйл эсвэл нууц үг буруу байна!");
-    //    }
-    //  }).catch(error => {
-    //      alert(error.message)
-    //      console.log(error);
-    //  });
   }
 render() {
     return (
@@ -200,7 +163,7 @@ render() {
             width="80%"
             height={250}
   					onBackdropPress={() => this.setState({ isVisible: false })}
-				>
+				  >
           <View style={{flex:1}}>
             <View style={{flexDirection:'row',alignSelf:'center',marginBottom:10}}>
               <Text style={{color:'#2D3954'}}>Бүртгэлтэй мэйл хаягаа оруулна уу.</Text>
@@ -212,24 +175,23 @@ render() {
                             underlineColorAndroid='transparent'
                             onChangeText={(email) => this.setState({email})}
                 />
-                </View>
               </View>
-              
-                <View style={{flexDirection:'row',marginBottom:5}}>
-                  <TouchableOpacity style={[Loginstyles.comfirmButton,{alignContent:'center',
-                                justifyContent: 'center',}]} 
-                        onPress={() => this.BidProject()}
-                        >
-                        <Text style={{color:'#fff',justifyContent:'center',
-                                textAlign:'center',}}>Нууц үг сэргээх</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[Loginstyles.closeButton,{alignContent:'center',
-                                justifyContent: 'center',}]} 
-                        onPress={() => this.setState({isVisible: false})}
-                        >
-                        <Text style={{color:'#fff',justifyContent:'center',
-                                textAlign:'center',}}>Хаах</Text>
-                  </TouchableOpacity>
+            </View>
+              <View style={{flexDirection:'row',marginBottom:5}}>
+                <TouchableOpacity style={[Loginstyles.comfirmButton,{alignContent:'center',
+                              justifyContent: 'center',}]} 
+                      onPress={() => this.BidProject()}
+                      >
+                      <Text style={{color:'#fff',justifyContent:'center',
+                              textAlign:'center',}}>Нууц үг сэргээх</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[Loginstyles.closeButton,{alignContent:'center',
+                              justifyContent: 'center',}]} 
+                      onPress={() => this.setState({isVisible: false})}
+                      >
+                      <Text style={{color:'#fff',justifyContent:'center',
+                              textAlign:'center',}}>Хаах</Text>
+                </TouchableOpacity>
               </View>
             </View>
         </Overlay>
@@ -263,8 +225,7 @@ render() {
               <View style={Loginstyles.buttons}>
                 <TouchableOpacity style={[Loginstyles.buttonContainer, Loginstyles.loginButton]} 
                   onPress={() => this.loginClicked()}>
-                  <Text style={Loginstyles.loginText}>Нэвтрэх</Text>
-                  {this.state.isLoading?<ActivityIndicator/>:null}
+                  {this.state.isLoading?<ActivityIndicator  size="large"/>:<Text style={Loginstyles.loginText}>Нэвтрэх</Text>}
                 </TouchableOpacity>
                 <TouchableOpacity style={[Loginstyles.buttonContainer, Loginstyles.loginButton]} 
                   onPress={() => this.props.navigation.navigate('Register')}>
@@ -280,6 +241,19 @@ render() {
     );
   }
 }
+export default connect(
+  state => ({
+    // loading: state.project.getIn(['project_list', 'loading']),
+		// projects: state.project.getIn(['project_list', 'data']),
+         // projects: state.project.getIn(['project_list', 'data']).toJS(),
+  }),
+  dispatch => {
+    return {
+      getAllProjects: bindActionCreators(getAllProjects, dispatch),
+      getAllWorkers: bindActionCreators(getAllWorkers, dispatch),
+    }
+  }
+)(LoginScreen);
  
 const Loginstyles = StyleSheet.create({
   container: {
@@ -415,4 +389,3 @@ const Loginstyles = StyleSheet.create({
     color: 'white',
   }
 });
-export default LoginScreen

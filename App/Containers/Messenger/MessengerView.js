@@ -1,64 +1,49 @@
 //This is an example code for Bottom Navigation//
 import React,{Component} from 'react';
-import { Text, View, TouchableOpacity, StyleSheet,ActivityIndicator,FlatList ,RefreshControl } from 'react-native';
-import {  Card, ListItem, Button ,Header ,SearchBar} from 'react-native-elements'
+import { Text, View, TouchableOpacity, StyleSheet,ActivityIndicator,FlatList ,RefreshControl,BackHandler } from 'react-native';
+import {  Card, ListItem, Rating, Button ,Header ,SearchBar} from 'react-native-elements'
 import { Header as Header2 } from 'react-navigation';
 import { getAllWorkers } from '../Search/WorkersActions'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux'
-const test = [{
-  "UserName" : "Naagii",
-  "ProPicture" : null,
-  "FirstName" : "Naagiii",
-  "LastName" : "Naagiii",
-	"Education":"Num",
-  "Job":"Developer",
-  "PhoneNumber" : 9999999,
-	"HomeAddress" : "UB Mongolia",
-	"UserEmail" : "naagii.dashdorj@gmail.com",
-	"Skills" :"English",
-  "Description": " Lorem ipsumLorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum.",
-  "ORating" : 4.7,
-  "FRating" : 5
-  },
-  {
-    "UserName" : "Test",
-    "ProPicture" : null,
-    "FirstName" : "TestF",
-    "LastName" : "TestL",
-    "Education":"Num",
-    "Job":"Developer",
-    "PhoneNumber" : 9999999,
-    "HomeAddress" : "UB Mongolia",
-    "UserEmail" : "naagii.dashdorj@gmail.com",
-    "Skills" :"English",
-    "Description": " Lorem ipsumLorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum.",
-    "ORating" : 4.7,
-    "FRating" : 5
-    }
-]
-const itemData = Object.values( test );
+
 class MessengerView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       value:'',
       error: null,
-      data: [],
+      data: []
     };
     this.arrayholder = [];
   }
+
   componentDidMount() {
+    this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
     this.props.getAllWorkers()
+
     const { workers, loading } = this.props
     this.arrayholder = workers
-    this.setState({ data: workers }); 
+    // while(loading){
+    //   console.log('waiting')
+    // }
+    // this.setState({ data: workers });
+    workers[0]==null?this._onRefresh.bind(this):this.setState({ data: workers }); 
     // this.arrayholder = itemData
     // this.setState({ data: itemData});
   }
+  componentWillUnmount(){
+    this.backHandler.remove()
+  }
+  handleBackPress = () => {
+    return true;
+  }
   _onRefresh() {
     this.props.getAllWorkers()
+    const { workers, loading } = this.props
+    this.arrayholder = workers
+    workers[0]==null?null:this.setState({ data: workers }); 
   }
   searchFilterFunction = text => {
     this.setState({
@@ -84,7 +69,8 @@ class MessengerView extends React.Component {
 		<View style={styles.emptyContainer}>
 		  <Text style={styles.emptyText}>{title}</Text>
 		</View>
-	  );
+    );
+    
   renderHeader = () => {
     return (
       <SearchBar
@@ -97,6 +83,7 @@ class MessengerView extends React.Component {
       />
     );
   };
+
   renderSeparator = () => {
 		return (
 			<View
@@ -107,56 +94,100 @@ class MessengerView extends React.Component {
   						}}
 			/>
 		);
-	};
-  renderItem = ({ item }) => (
-    <TouchableOpacity style={{width:'100%'}}
-      onPress={() => {
-            this.navigateDetail(item)
-      }}>
-      <ListItem 
-        leftAvatar={item.ProPicture?{ source: { uri:'http://task.mn/content/'+item.ProPicture+'' } }:
-        {source : {uri: 'http://task.mn/Content/images/UserPictures/user2.png'}}}
-        title={
-          <View style={{flexDirection:'column'}}>
-            <Text style={{color:'#4285F4',fontWeight:'bold'}}>{item.FirstName+' '+item.LastName}</Text>
-            <Text style={{color:'#4285F4'}}>({item.UserName})</Text>
-          </View>
-        }
-        rightTitle={
-          <View style={{flex:1}}>
-
-          </View>
-        }
-        bottomDivider
-        chevron
+  };
+  renderList(){
+    
+    const { workers, loading } = this.props
+    
+    return(
+      <FlatList
+        refreshControl={
+              <RefreshControl
+                refreshing={loading}
+                onRefresh={this._onRefresh.bind(this)}
+              />
+            }
+        ListEmptyComponent={
+              <this.EmptyComponent title="Хайлт олдсонгүй" />}
+        keyExtractor= {item => item.ID}
+        data={this.state.data}
+        renderItem={this.renderItem}
+        ListHeaderComponent={this.renderHeader}
       />
-    </TouchableOpacity>
+    )
+    
+  }
+  renderItem = ({ item }) => (
+    <View style={{margin:10}}>
+      <TouchableOpacity style={{width:'100%'}}
+        onPress={() => {
+              this.navigateDetail(item)
+        }}>
+        <ListItem 
+          leftAvatar={item.ProPicture?{ source: { uri:'http://task.mn/content/'+item.ProPicture+'' } }:
+          {source : {uri: 'http://task.mn/Content/images/UserPictures/user2.png'}}}
+          title={
+            <View style={{flexDirection:'column'}}>
+              <Text style={{color:'#4285F4',fontSize:16,fontWeight:'bold'}}>{item.FirstName+' '+item.LastName}</Text>
+              {/* <Text style={{color:'#4285F4'}}>({item.UserName})</Text> */}
+            </View>
+          }
+          subtitle={
+            <View style={{flex:1}}>
+              <Text style={{color:'black',fontSize:14 ,fontStyle:'italic'}}>{item.Job}</Text> 
+            </View>
+          }
+          // rightTitle={
+          //   <View style={{flex:1}}>
+          //     <Text>Үнэлгээ : {item.ORatings?item.ORatings:item.FLRatings}</Text>
+          //     {item.ORatings?
+          //       <View style={{flexDirection:'row'}}>
+          //         <Rating
+          //           imageSize={20}
+          //           readonly
+          //           startingValue={item.ORatings}
+          //         />
+          //       </View>
+          //     :
+          //       <Rating
+          //         imageSize={20}
+          //         readonly
+          //         startingValue={item.FLRatings}
+          //       />
+          //   }
+              
+          //   </View>
+          // }
+          rightTitle={
+            <View style={{flex:1}}>
+              
+              <Text>Үнэлгээ : {item.ORatings?item.FLRatings?(item.ORatings+item.FLRatings)/2:item.ORatings:item.FLRatings?item.FLRatings:null}</Text>
+                <Rating
+                  imageSize={20}
+                  readonly
+                  startingValue={item.ORatings?item.FLRatings?(item.ORatings+item.FLRatings)/2:item.ORatings:item.FLRatings?item.FLRatings:null}
+                />
+              
+            </View>
+          }
+          bottomDivider
+          chevron
+        />
+      </TouchableOpacity>
+    </View>
+    
     
   )
   render() {
     const { workers, loading } = this.props
     return(
-      <View>
+      <View style={{backgroundColor:'#FFF',flex:1}}>
         <View>
-        {/* {loading ? (
+        {loading ? (
           <ActivityIndicator />
-        ) : ( */}
-          <FlatList
-          	refreshControl={
-              		<RefreshControl
-              			refreshing={loading}
-              			onRefresh={this._onRefresh.bind(this)}
-              		/>
-                }
-            ListEmptyComponent={
-                  <this.EmptyComponent title="Хайлт олдсонгүй" />}
-            keyExtractor= {this._keyExtractor}
-            
-            data={this.state.data}
-            renderItem={this.renderItem}
-            ListHeaderComponent={this.renderHeader}
-          />
-        {/* )} */}
+        ) : (
+          this.renderList()
+        )}
         </View>
       </View>
      );

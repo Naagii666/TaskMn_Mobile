@@ -2,12 +2,12 @@
 import React,{Component} from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux'
-import { Text, View, TouchableOpacity, StyleSheet,FlatList,RefreshControl ,TextInput,ScrollView} from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet,FlatList,RefreshControl ,TextInput,Alert,ScrollView ,ActivityIndicator} from 'react-native';
 import {  Card, ListItem, Button ,Header} from 'react-native-elements'
 import { Header as Header2 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { getBidListHire ,onChooseBid} from './ProjectsActions'
-import { ActivityIndicator } from 'react-native-paper';
+// import {  } from 'react-native-paper';
 import { getAllWorkers } from '../Search/WorkersActions'
 class ChooseBid extends React.Component {
   constructor(props) {
@@ -49,6 +49,38 @@ class ChooseBid extends React.Component {
 		  item: item
 		  })
   }
+  NavigateMilestone(item){
+    const { navigation } = this.props;
+    const id = navigation.getParam('id', []);
+    var data = [{
+      "ProjectID" : id,
+      "LancerID" : item.LancerID,
+      "BidID" : item.ID
+    }]
+    Data = Object.values( data )
+    // this.props.onChooseBid(d[0])
+    this.props.navigation.navigate('MileStone',{
+      data : Data[0]
+    })
+  }
+  onChooseBid = (item) => {
+    Alert.alert(
+      'Анхааруулга',
+      'Саналыг сонгосноор даалгаварт өөрчилөлт оруулах боломжгүй болно!',
+      [
+        {
+          text: 'Цуцлах',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'Сонгох', onPress: () => {
+          this.ChooseBid(item)
+        }},
+      ],
+      { cancelable: true },
+    );
+  }
+  
   ChooseBid(item){
     const { navigation } = this.props;
     const id = navigation.getParam('id', []);
@@ -57,10 +89,8 @@ class ChooseBid extends React.Component {
       "LancerID" : item.LancerID,
       "BidID" : item.ID
     }]
-    d = Object.values( data )
-    this.props.onChooseBid(d[0])
-    this.props.navigation.navigate('MileStone',{
-    })
+    Data = Object.values( data )
+    this.props.onChooseBid(Data[0])
   }
   componentDidMount() {
     this.props.getBidListHire()
@@ -74,8 +104,9 @@ class ChooseBid extends React.Component {
         <View style={{flex:1}} >
             <TouchableOpacity 
                     onPress={() => {
-                        this.props.navigation.navigate('ProjectDetail',{
-                  })
+                        this.props.navigation.pop()
+                  //       this.props.navigation.navigate('ProjectDetail',{
+                  // })
             }}>
                 <View style={{flexDirection:'row'}}>
                     <Icon name="chevron-left" size={16} color="#fff"/>
@@ -88,6 +119,7 @@ class ChooseBid extends React.Component {
   findProjectBid(ProjectID){
     const { navigation } = this.props;
     const id = navigation.getParam('id', []);
+    // alert(ProjectID)
     if(id == ProjectID)
       return true
     return false
@@ -105,20 +137,25 @@ class ChooseBid extends React.Component {
 	};
   keyExtractor = (item, index) => index.toString()
   renderItem = ({ item }) => (
-    <View style={{justifyContent:'space-between',flexDirection:'column', }}>
+    <View style={{justifyContent:'space-between',flexDirection:'column'}}>
       {this.findProjectBid(item.ProjectID)?(
         <View style={styles.body}>
           <View style={styles.container}>
-            <Text style={styles.titleInfo}>Хугацаа :</Text>
+            <Text style={styles.userInfo}>Хугацаа :</Text>
             <Text style={styles.titleInfo}>{item.Time + ' хоног'}</Text>
           </View>
           <View style={styles.container}>
-            <Text style={styles.titleInfo}>Үнэ :</Text>
+            <Text style={styles.userInfo}>Үнэ :</Text>
             <Text style={styles.titleInfo}>{item.Cap+' ₮'}</Text>
           </View>
           <View style={styles.container}>
-            <Text style={styles.titleInfo}>Тайлбар :</Text>
-            <Text style={[styles.titleInfo,styles.Summary]}>{item.Description}</Text>
+            <Text style={styles.userInfo}>Төлөв :</Text>
+            <Text style={styles.titleInfo}>{item.Winner?'Сонгогдсон':'Хүлээгдэж байгаа'}</Text>
+          </View>
+          <View style={styles.container}>
+            <Text style={styles.userInfo}>Тайлбар :</Text>
+            
+            <Text adjustsFontSizeToFit={true} style={[styles.titleInfo,{flex:1 , marginHorizontal:'5%',textAlign:'right'}]}>{item.Description}</Text>
               {/* <TextInput
                 style={styles.Summary}
                 numberOfLines={20}
@@ -130,7 +167,7 @@ class ChooseBid extends React.Component {
                 value={item.Description}/> */}
           </View>
           <View style={styles.container}>
-            <Text style={styles.titleInfo}>Санал илгээгч :</Text>
+            <Text style={styles.userInfo}>Санал илгээгч :</Text>
             <TouchableOpacity 
                       onPress={() => this.navigateDetail(this.findUser(item.LancerID))}
             >
@@ -140,19 +177,52 @@ class ChooseBid extends React.Component {
             </TouchableOpacity>
           </View>
           <View style={{marginVertical:20}}>
-
-            <Button
-              buttonStyle={{
-                borderRadius:10,
-                width:'90%',
-                backgroundColor:'#69d275',
-                alignSelf:'center'
-              }}
-              onPress={() => {
-                  this.ChooseBid(item)
-              }}
-              title="Сонгох"
-            />
+          {item.Winner?
+              <Button
+                buttonStyle={{
+                  borderRadius:10,
+                  width:'90%',
+                  backgroundColor:'#868E96',
+                  alignSelf:'center',
+                  flex:1
+                }}
+                onPress={() => {
+                    Alert.alert('','Саналыг сонгосон байна!')
+                }}
+                title="Сонгосон"
+              />
+              
+              :
+              <View style={{flexDirection:'row',flex:1}}>
+                <View style={[styles.deleteButton]}>
+                  <Button
+                    buttonStyle={{
+                      borderRadius:5,
+                      backgroundColor:'#69d275',
+                      alignSelf:'center',
+                      width:'100%',
+                    
+                    }}
+                    onPress={() => {
+                        this.NavigateMilestone(item)
+                    }}
+                    title="Даалгавар"
+                  />
+                </View>
+                <View style={[styles.bidButton]}>
+                  <Button
+                    buttonStyle={{
+                      borderRadius:5,
+                      backgroundColor:'#69d275',
+                      alignSelf:'center',
+                      width:'100%'
+                    }}
+                    onPress={() => {this.onChooseBid(item)}}
+                    title="Сонгох"
+                  />
+                </View>
+            </View>
+            }
           </View>
         </View>
       ):(
@@ -208,7 +278,6 @@ export default connect(
     bids: state.project.getIn(['bid_list_hire', 'data']),
     loading2: state.workers.getIn(['workers_list', 'loading']),
     workers: state.workers.getIn(['workers_list', 'data']),
-    loading3: state.workers.getIn(['on_choose_bid', 'loading']),
 		// choose_bid: state.workers.getIn(['on_choose_bid', 'data']),
          // projects: state.project.getIn(['project_list', 'data']).toJS(),
   }),
@@ -229,11 +298,17 @@ const styles = StyleSheet.create({
     flex:1
   },
   body: {
-    backgroundColor:'#FFF',
-    margin:10,
-    borderBottomWidth:1, 
+    backgroundColor:'#E7EBF1',
+    margin:15,
+    // borderBottomWidth:1, 
     borderColor:'#4285F4',
-    marginBottom:10
+    marginBottom:10,
+    justifyContent:'space-between',
+    flexDirection:'column',
+    borderWidth:1,
+    borderColor:'#4285F4',
+    borderRadius:10,
+    padding:5
   },
   container: {
     flexDirection:'row',
@@ -269,12 +344,12 @@ const styles = StyleSheet.create({
   },
   userInfo:{
     fontSize:14,
-    color:"black",
+    color:"#3C4348",
     fontWeight:'300',
   },
   titleInfo:{
     fontSize:14,
-    color:"#000",
+    color:"#3C4348",
     fontWeight:'300',
     maxHeight:700
 
@@ -283,5 +358,38 @@ const styles = StyleSheet.create({
     fontSize:18,
     marginTop:20,
     color: "#FFFFFF",
+  },
+  emptyContainer:{
+		alignItems:'center',
+		marginTop:20 
+	},
+	emptyText:{
+		marginTop:20 ,
+		color:'black'
+  },
+  bidButton:{
+    backgroundColor:'#E7EBF1',
+    // marginBottom:20,
+    alignContent:'center',
+    justifyContent: 'center',
+    height:'70%',
+    width:'40%',
+    borderWidth:1,
+    borderColor:'#E7EBF1',
+    borderRadius:10,
+    marginHorizontal:'5%',
+    marginVertical:5
+  },
+  deleteButton:{
+    backgroundColor:'#E7EBF1',
+    alignContent:'center',
+    justifyContent: 'center',
+    width:'40%',
+    borderRadius:10,
+    height:'70%',
+    borderWidth:1,
+    borderColor:'#E7EBF1',
+    marginHorizontal:'5%',
+    marginVertical:5
   },
 })

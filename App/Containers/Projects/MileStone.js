@@ -1,17 +1,32 @@
 import React,{Component} from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux'
-import { Text, View, TouchableOpacity, StyleSheet ,ScrollView,Dimensions,BackHandler,Alert,TextInput,FlatList,RefreshControl} from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet ,ScrollView,Dimensions,BackHandler,Alert,TextInput,FlatList,RefreshControl , ActivityIndicator} from 'react-native';
 import {  Card, ListItem, Button ,Header} from 'react-native-elements'
 import { Header as Header2 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome'
-import HTML from 'react-native-render-html';
-import ImageView from 'react-native-image-view';
-import { onDeleteProject ,getUserProjects ,getMilestones} from './ProjectsActions'
-import { getAllWorkers } from '../Search/WorkersActions'
+import {getMilestones , onAddTask , onDeleteTask} from './ProjectsActions'
 class MileStone extends React.Component {   
+    constructor(props) {
+      super(props);
+      this.state = {
+        TaskName : '',
+        TaskID : '',
+        ProjectID : '',
+        BidID : '',
+        LancerID : '',
+        Amount: '',
+        height :0
+      }
+    }
     componentDidMount() {
-        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+      const item = this.props.navigation.getParam('data', []);
+      this.setData(item)
+      this.props.getMilestones(item.ProjectID),
+      this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
+    }
+    setData(item){
+      this.setState({ProjectID:item.ProjectID , BidID:item.BidID, LancerID:item.LancerID})
     }
     componentWillUnmount(){
         this.backHandler.remove()
@@ -22,57 +37,21 @@ class MileStone extends React.Component {
     }
     goBack(){
         this.setState({bidView: false});
-        this.props.navigation.navigate('Tabs',{
-        })
+        this.props.navigation.pop()
     } 
-    findUser(lancerID){
-        const workers = this.props.workers
-            var data = null
-            workers.forEach((worker) => {
-                if(worker.UserID === lancerID) {
-                    // this.setState({userName: worker.UserName });
-                    data = worker;
-              }
-        })
-        return data
-      }
-    findUserName(lancerID){
-            const workers = this.props.workers
-            var data = null
-            workers.forEach((worker) => {
-                if(worker.UserID === lancerID) {
-                    data = worker.UserName;
-          }
-        })
-          return data
-      }
-    deleteProject(ID){
-	    Alert.alert(
-            '',
-            'Энэ ажлыг устгах уу ?',
-            [
-                {
-                text: 'Үгүй',
-                onPress: () => console.log('Cancel Pressed'),
-                style: 'cancel',
-                },
-                {text: 'Тийм', onPress: () => {
-                    this.props.onDeleteProject(ID),
-                    this.props.getUserProjects()
-                    this.props.navigation.navigate('Tabs',{
-                    })
-                }},
-            ],
-            { cancelable: true },
-            );
-	}
+    renderCenterComponent(){
+      return(
+        <View style={{flex:1,alignContent:'center'}} >
+          <Text style={{color: '#fff',fontWeight:'bold',fontSize:18}}>Даалгавар</Text>
+        </View>
+      )
+    }
     renderLeftComponent(){
 		return(
 			<View style={{flex:1}} >
 				<TouchableOpacity 
 						onPress={() => {
-                            this.props.navigation.navigate('Tabs',{
-                      })
+                            this.props.navigation.pop()
                 }}>
 					<View style={{flexDirection:'row'}}>
                         <Icon name="chevron-left" size={16} color="#fff"/>
@@ -83,176 +62,187 @@ class MileStone extends React.Component {
         )
     }
     EmptyComponent = ({ title }) => (
-		<View style={styles.emptyContainer}>
-		  <Text style={styles.emptyText}>{title}</Text>
-		</View>
-	);
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>{title}</Text>
+      </View>
+	  );
     renderSeparator = () => {
-		return (
-			<View
-  				style={{
-					marginVertical:10,
-    				borderBottomColor: '#dcdcdc',
-    				borderBottomWidth: 1,
-  						}}
-			/>
-		);
+      return (
+        <View
+            style={{
+            marginVertical:10,
+              borderBottomColor: '#dcdcdc',
+              borderBottomWidth: 1,
+                }}
+        />
+      );
     };
-    navigateDetail(item){
-		this.props.navigation.navigate('WorkerDetail',{
-		  item: item
-		  })
-    }
     keyExtractor = (item, index) => index.toString();
-	_onRefresh(id) {
-		this.props.getMilestones(id)
-	}
+
+	  _onRefresh() {
+		  this.props.getMilestones(this.state.ProjectID)
+    }
+
+    DeleteTask = (item) =>{
+      this.props.onDeleteTask(item.TaskID , this.state)
+    }
+    InsertTask(){
+      this.state.TaskName!=''?(
+        this.props.onAddTask(this.state),
+        this.clearText()
+      ):
+      null
+    }
+    clearText(){
+      this.setState({TaskName:'',Amount:''})
+    }    
     renderItem = ({ item }) => (
-       <View>
-           {alert(item.TaskName)}
-           {item.TaskName}
-       </View>
+      <View style={styles.Skill}>
+        <View style={{flex:1 , flexDirection:'column',margin:5}}>
+          <Text style={styles.Text}>Даалгавар : {item.TaskName}</Text>
+          <Text style={styles.Text}>Үнийн хэмжээ : {item.Amount}</Text>
+        </View>
+        <TouchableOpacity style={{marginRight:10 ,alignItems:'center',alignContent:'center',justifyContent:'center'}} onPress = {() => {this.DeleteTask(item)} }>
+              <Icon
+                name="trash"
+                size={25}
+                color="#F98383"
+              />
+        </TouchableOpacity>
+      </View>
     );
     render() {
-        const { navigation ,loading2 , milestones } = this.props;
-        const item = navigation.getParam('item', []);
+        const {loading , milestones } = this.props;
+        const item = this.props.navigation.getParam('data', []);
 
         return(
-        <View style={{flex:1}}>
-            <Header
-            containerStyle={{
-                height:Header2.HEIGHT,
-                backgroundColor: '#4285F4',
-            }}
-                leftComponent={this.renderLeftComponent()}
-                centerComponent={{ text: 'Даалгавар нэмэх', style:styles.headerTitle }}
-            />
-            <ScrollView >
-                <View style={{marginHorizontal:10}}>
-                   
-                </View>
-            </ScrollView>
-            
+          <View style={{ flex: 1}}>
+          <Header containerStyle={{
+              height:Header2.HEIGHT,
+              backgroundColor: '#4285F4',
+              }}
+              leftComponent={this.renderLeftComponent()}
+              centerComponent={this.renderCenterComponent()}
+          />
+          <View>
+          {	
+          loading?(
+              <ActivityIndicator />
+              ) : (
+              <View>
+                  <FlatList
+                      refreshControl={
+                              <RefreshControl
+                                  refreshing={loading}
+                                  onRefresh={this._onRefresh.bind(this)}
+                              />
+                          }
+                      ListEmptyComponent={
+                        <this.EmptyComponent title="Даалгавар байхгүй." />
+                      }
+                      keyExtractor= {item => item.TaskID}
+                      data={milestones}
+                      renderItem={this.renderItem}
+                  />
+                  <View style={styles.Skill}>
+                    <View style={{flexDirection:'column',flex:1,margin:5}}>
+                      <TextInput style={styles.inputs}
+                              numberOfLines={5}
+                              ellipsizeMode="head"
+                              keyboardType="default"
+                              multiline={true}
+                              placeholder="Даалгавар"
+                              value={this.state.TaskName}
+                              onChangeText={TaskName => this.setState({TaskName})}
+                      />
+                      <TextInput style={styles.inputs}
+                              numberOfLines={5}
+                              ellipsizeMode="head"
+                              keyboardType="numeric"
+                              multiline={true}
+                              placeholder="Даалгаврын үнэ"
+                              value={this.state.Amount}
+                              onChangeText={Amount => this.setState({Amount})}
+                      />
+                    </View>
+                      <TouchableOpacity style={{marginRight:10 ,alignItems:'center',alignContent:'center',justifyContent:'center'}} onPress = {() => {this.InsertTask()} }>
+                          <Icon
+                              name="plus-circle"
+                              size={25}
+                              color="#69d275"
+                          />
+                      </TouchableOpacity>
+                  </View>
+              </View>
+              )
+          }
+          </View>
         </View>
-        
         );
     }
 }
 export default connect(
     state => ({
-            loading: state.project.getIn(['on_delete_project', 'loading']),
-                // projects: state.project.getIn(['project_list', 'data']).toJS(),
-            milestones: state.workers.getIn(['milestone_list', 'data']),
-            loading2: state.workers.getIn(['milestone_list', 'loading']),
-            workers: state.workers.getIn(['workers_list', 'data']),
-            loading3: state.workers.getIn(['on_choose_bid', 'loading']),
-
+            milestones: state.project.getIn(['milestone_list', 'data']),
+            loading: state.project.getIn(['milestone_list', 'loading']),
     }),
     dispatch => {
         return {
-            onDeleteProject: bindActionCreators(onDeleteProject, dispatch),
-            getUserProjects: bindActionCreators(getUserProjects, dispatch),
-            getAllWorkers: bindActionCreators(getAllWorkers, dispatch),
             getMilestones:  bindActionCreators(getMilestones, dispatch),
+            onAddTask: bindActionCreators(onAddTask, dispatch),
+            onDeleteTask: bindActionCreators(onDeleteTask, dispatch),
         }
     }
-)(MileStone);;
+)(MileStone);
 const styles = StyleSheet.create({
-  headerTitle: {
-    color: '#fff',
-    alignSelf:'center',
-    fontSize:18 ,
-    fontWeight:'bold',
-    flex:1
-  },
-  backButton:{
-    backgroundColor:'#B3B3B3',
-    alignContent:'center',
-    justifyContent: 'center',
-    width:'40%',
-    borderRadius:10,
-    height:'70%',
+  inputs:{
+    borderColor: '#DCDCDC',
+    backgroundColor:'#F6F6F6',
     borderWidth:1,
-    borderColor:'#B3B3B3',
-    marginHorizontal:'5%',
-    marginVertical:5
-  },
-  bidButton:{
-    backgroundColor:'#69d275',
-    // marginBottom:20,
-    alignContent:'center',
-    justifyContent: 'center',
-    height:'70%',
-    width:'40%',
-    borderWidth:1,
-    borderColor:'#27b737',
-    borderRadius:10,
-    marginHorizontal:'5%',
-    marginVertical:5
-  },
-  constContainer:{
-    left:0,
-    right:0,
-    bottom:0,
-    height:Header2.HEIGHT,
-    backgroundColor:'#fff',
-    borderTopWidth:2,	
-    borderTopColor:'#dcdcdc',
-    flexDirection:'row',
-    // alignSelf:'center'
-    position:'absolute',
-    flex:0.1,
-  },
-  bidText:{
-    color:'#fff',
-    // fontWeight:'bold',
-    fontSize:14,
-    justifyContent:'center',
-    textAlign:'center',
-    flexDirection:'row'
-  },
-  container: {
-    flexDirection:'row',
-    justifyContent:'space-between',
-    flex:1,
-    marginTop:10
-  },
-  textInput:{
+    fontSize:18,
+    // flex:1,
     width:'80%',
-    alignSelf:'center',
-    // backgroundColor:'#4285F4',
-    margin:5,
+    height:40,
+    // maxHeight:200,
+    marginLeft:10,
     borderRadius:10,
-    borderWidth:1,
-    paddingHorizontal:10,
-    borderColor:'#4285F4'
+    paddingHorizontal:5,
+    marginVertical:5
+},
+Text:{
+    alignItems:'center' , 
+    justifyContent:'flex-start' , 
+    marginLeft:10 ,
+    color:'#3C4348',
+    fontSize:15
+},
+Skill:{
+    marginVertical:10,
+    marginHorizontal:5,
+    // flex: 1,
+    flexDirection:'row',
+    alignContent:'space-between',
+    justifyContent:'space-between',
+    backgroundColor:'#E7EBF1',
+    borderRadius:10,
 
-  },
-  Summary:{
-    width:'70%',
-    height:80,
-    alignSelf:'center',
-    paddingHorizontal:10,
-    marginLeft:'10%',
-    // backgroundColor:'#4285F4',
-    color:"#000",
-    margin:5,
-    borderRadius:10,
-    borderWidth:1,
+},
+bidButton:{
+    backgroundColor:'#FFF',
+    // marginBottom:20,
+    height:'70%',
+    width:'20%',
+    // borderWidth:1,
     borderColor:'#4285F4',
-    maxHeight:500,
-
-  },
-  userInfo:{
-    fontSize:14,
-    color:"black",
-    fontWeight:'300',
-  },
-  titleInfo:{
-    fontSize:14,
-    color:"#000",
-    fontWeight:'300',
-    maxHeight:500
-
-  },
+    borderRadius:10,
+    marginVertical:5
+},
+emptyContainer:{
+  alignItems:'center',
+  margin:5 ,
+},
+emptyText:{
+  margin:5 ,
+  color:'black'
+},
 })

@@ -29,6 +29,62 @@ function* getAllProjects() {
 		
 	}
 }
+function* getWorkerComments({ payload }) {
+	// alert(payload)
+	try {
+		var formData = new FormData();
+		formData.append('UserID', payload)
+		
+		let token = yield getAuthenticationToken()
+		let res = yield request(token).post(`api/account/getWorkerComments`,formData)
+		// alert(res.data)
+		if(!res.data) {
+			return yield put({
+				type: types.GET_WORKER_COMMENTS_FAILED
+			})
+		}
+		// alert('here')
+		// this.props.navigation.navigate("Ажлууд")
+		yield put({
+			type: types.GET_WORKER_COMMENTS_SUCCESS,
+			payload: res.data
+		})
+
+	} catch(e) {
+		alert(e.message)
+		yield put({
+			type: types.GET_WORKER_COMMENTS_FAILED
+		})
+	}
+}
+function* getWorkerSkills({ payload }) {
+	// alert(payload)
+	try {
+		var formData = new FormData();
+		formData.append('UserID', payload)
+		
+		let token = yield getAuthenticationToken()
+		let res = yield request(token).post(`api/account/getWorkerSkills`,formData)
+		// alert(res.data)
+		if(!res.data) {
+			return yield put({
+				type: types.GET_WORKER_SKILLS_FAILED
+			})
+		}
+		// alert('here')
+		// this.props.navigation.navigate("Ажлууд")
+		yield put({
+			type: types.GET_WORKER_SKILLS_SUCCESS,
+			payload: res.data
+		})
+
+	} catch(e) {
+		alert(e.message)
+		yield put({
+			type: types.GET_WORKER_SKILLS_FAILED
+		})
+	}
+}
 
 function* onBidProject({ payload }) {
 	// alert(payload.projectID)
@@ -41,28 +97,24 @@ function* onBidProject({ payload }) {
 		
 		let token = yield getAuthenticationToken()
 		let res = yield request(token).post(`api/project/AddBid`,formData)
-
+		// alert(res.data.error)
+		// console.log(res)
 		if(!res.data) {
-			
 			return yield put({
 				type: types.ON_BID_PROJECT_FAILED
 			})
 		}
-		Alert.alert('Амжилттай','Саналыг хүлээн авлаа')
+		Alert.alert('Мэдэгдэл',res.data)
+		// Alert.alert('Амжилттай','Саналыг хүлээн авлаа')
 		// this.props.navigation.navigate("Ажлууд")
 		yield put({
 			type: types.ON_BID_PROJECT_SUCCESS,
 			payload: res.data
 		})
 
-		yield put({
-			type: types.ON_BID_PROJECT
-		})
-
 		// yield put(NavigationActions.back())
 	} catch(e) {
-		// alert(e.message)
-		//alert(e.message)
+		alert(res.error)
 		yield put({
 			type: types.ON_BID_PROJECT_FAILED
 		})
@@ -98,21 +150,59 @@ function* getAllWorkers() {
 	//   	}
 	// })
 }
+function* onAddComment({ payload}) {
+	try {
+		var formData = new FormData();
+		formData.append('toUser', payload.toUser)
+		formData.append('Text', payload.Text)
+		// alert(payload.Text)
+		let token = yield getAuthenticationToken()
+		let res = yield request(token).post(`api/Account/AddComment`,formData)
+		if(!res.data) {
+			return yield put({
+				type: types.ON_ADD_COMMENT2_FAILED
+			})
+		}
+		// Alert.alert('Амжилттай','Ажил нэмэгдлээ')
+		yield put({
+			type: types.ON_ADD_COMMENT2_SUCCESS,
+			payload: res.data
+		})
+	} catch(e) {
+		alert(e.message)
+		yield put({
+			type: types.ON_ADD_COMMENT2_FAILED
+		})
+	}
+}
+
 
 function* watchGetAllWorkers() {
   yield takeEvery(types.GET_ALL_WORKERS, getAllWorkers)
 }
-
+function* watchGetWorkerComments() {
+	yield takeEvery(types.GET_WORKER_COMMENTS, getWorkerComments)
+}
+function* watchGetWorkerSkills() {
+	yield takeEvery(types.GET_WORKER_SKILLS, getWorkerSkills)
+}
 function* watchGetAllProjects() {
 	yield takeEvery(types.GET_ALL_PROJECTS, getAllProjects)
   }
 function* watchGetOnBidProject() {
 	yield takeEvery(types.ON_BID_PROJECT, onBidProject)
 }
+function* watchOnAddComment() {
+	yield takeEvery(types.ON_ADD_COMMENT2, onAddComment)
+}
+
 export default function *root() {
   yield all([
 	fork(watchGetAllWorkers),
 	fork(watchGetAllProjects),
-	fork(watchGetOnBidProject)
+	fork(watchGetOnBidProject),
+	fork(watchGetWorkerComments),
+	fork(watchGetWorkerSkills),
+	fork(watchOnAddComment)
   ])
 }

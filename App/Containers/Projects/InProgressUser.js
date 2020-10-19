@@ -1,16 +1,22 @@
 import React,{Component} from 'react';
 import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux'
-import { Text, View, TouchableOpacity, StyleSheet ,ScrollView,Dimensions,BackHandler,Alert,TextInput,FlatList,RefreshControl,ActivityIndicator } from 'react-native';
+import { Text, View, TouchableOpacity, StyleSheet ,ScrollView,Dimensions,BackHandler,Alert,TextInput,FlatList,RefreshControl,ActivityIndicator} from 'react-native';
 import {  Card, ListItem, Button ,Header} from 'react-native-elements'
 import { Header as Header2 } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import Icon2 from 'react-native-vector-icons/MaterialIcons'
 import HTML from 'react-native-render-html';
 import ImageView from 'react-native-image-view';
-import { getMilestones , onApplyTask ,onApplyFinish ,onCheckPayment} from './ProjectsActions'
+import { getMilestones , onComfirmTask ,onComfirmFinish , onSubmitPayment ,onCheckPayment} from './ProjectsActions'
 import { getAllWorkers } from '../Search/WorkersActions'
-class inProgress extends React.Component {   
+class InProgressUser extends React.Component {  
+    constructor(props) {
+      super(props);
+        this.state = {
+            amount : ''
+        };
+    } 
     componentDidMount() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.handleBackPress);
         const { navigation} = this.props;
@@ -23,7 +29,7 @@ class inProgress extends React.Component {
           (
           this.props.getMilestones(item.ID),
           this.props.onCheckPayment(item.ID)
-        )
+          )
     }
     componentWillUnmount(){
         this.backHandler.remove()
@@ -32,9 +38,9 @@ class inProgress extends React.Component {
         this.goBack(); // works best when the goBack is async
         return true;
     }
-    ApplyTask(taskID){
+    ComfirmTask(taskID){
       const item = this.props.navigation.getParam('item', []);
-      this.props.onApplyTask(taskID , item.ProjectID)
+      this.props.onComfirmTask(taskID , item.ID)
     }
     goBack(){
         this.props.navigation.pop(),
@@ -53,9 +59,10 @@ class inProgress extends React.Component {
           },
           {text: 'Тийм', onPress: () => {
             const item = this.props.navigation.getParam('item', []);
-            this.props.onApplyFinish(item.ProjectID)
-            // this.props.navigation.pop()
-            // Alert('tada')
+            this.props.onComfirmFinish(item.ID),
+            this.props.navigation.pop(),
+            this.props.navigation.navigate('Tabs',{
+            })
           }},
         ],
         { cancelable: true },
@@ -100,6 +107,10 @@ class inProgress extends React.Component {
         </View>
       )
     }
+    SubmitPayment(PID){
+      this.state.amount==''?Alert.alert('Алдаа', 'Баталгаажуулах дүнг оруулна уу!'):
+      this.props.onSubmitPayment(this.state.amount , PID)
+    }
     EmptyComponent = ({ title }) => (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>{title}</Text>
@@ -122,12 +133,12 @@ class inProgress extends React.Component {
 
     _onRefresh() {
       const item = this.props.navigation.getParam('item', []);
-      this.props.getMilestones(item.ProjectID)
+      this.props.getMilestones(item.ID)
     }
 
     renderItem = ({ item }) => (
       <View style={styles.Skill}>
-        <View style={{ flexDirection:'column',margin:5}}>
+        <View style={{flex:1 , flexDirection:'column',margin:5}}>
           <Text style={styles.Text}>Даалгавар : {item.TaskName}</Text>
           <Text style={styles.Text}>Үнийн хэмжээ : {item.Amount}</Text>
           <Text style={styles.Text}>Төлөв : {item.Status=='Pending'?'Хүсэлт илгээсэн':item.Status=='Confirmed'?'Дууссан':'Дуусаагүй'}</Text>
@@ -142,7 +153,7 @@ class inProgress extends React.Component {
             />
           </TouchableOpacity>
         :item.Status=="Pending"?
-          <TouchableOpacity style={{marginRight:10 ,alignItems:'center',alignContent:'center',justifyContent:'center'}} >
+          <TouchableOpacity style={{marginRight:10 ,alignItems:'center',alignContent:'center',justifyContent:'center'}} onPress = {() => {this.ComfirmTask(item.TaskID)} }>
               <Icon
                   name="check-square"
                   size={25}
@@ -150,9 +161,9 @@ class inProgress extends React.Component {
               />
           </TouchableOpacity>
         :
-          <TouchableOpacity style={{marginRight:10 ,alignItems:'center',alignContent:'center',justifyContent:'center'}} onPress = {() => {this.ApplyTask(item.TaskID)} }>
+          <TouchableOpacity style={{marginRight:10 ,alignItems:'center',alignContent:'center',justifyContent:'center'}} >
               <Icon
-                  name="plus-square"
+                  name="times"
                   size={25}
                   color="#69d275"
               />
@@ -163,7 +174,7 @@ class inProgress extends React.Component {
     );
 
     render() {
-        const { navigation ,loading, milestones , loading2 , payment , loading3  } = this.props;
+        const { navigation ,loading, milestones , loading2,payment , loading3 } = this.props;
         const item = navigation.getParam('item', []);
         return(
           <View style={{flex:1}}>
@@ -176,52 +187,69 @@ class inProgress extends React.Component {
                 centerComponent={{ text: item.Name, style:styles.headerTitle }}
             />
             <ScrollView style={{marginBottom:Header2.HEIGHT }}>
-              <View style={{marginHorizontal:10 }}>
+              <View style={{marginHorizontal:10}}>
 
                 <View style={{marginVertical:10}}>
                     <Text style={{color:'#4285F4'}}>
-                        Сонгосон санал
+                        Санал
                     </Text>
                 </View>
 
-                <View style={{justifyContent:'space-between',flexDirection:'column',borderWidth:1,borderColor:'#4285F4',borderRadius:10,margin:5,backgroundColor:'#E7EBF1'}}>
-                  <View style={styles.body}>
-                      <View style={styles.container}>
-                          <Text style={styles.userInfo}>Хугацаа :</Text>
-                          <Text style={styles.titleInfo}>{item.Time + ' хоног'}</Text>
-                      </View>
-
-                      <View style={styles.container}>
-                          <Text style={styles.userInfo}>Үнэийн санал :</Text>
-                          <Text style={styles.titleInfo}>{item.Cap+' ₮'}</Text>
-                      </View>
-
-                      {/* <View style={styles.container}>
-                          <Text style={styles.titleInfo}>Төлөв :</Text>
-                          <Text style={styles.titleInfo}>{item.Status + ' хоног'}</Text>
-                      </View> */}
-
-                      <View style={styles.container}>
-                          <Text style={styles.userInfo}>Тайлбар :</Text>
-                          <Text adjustsFontSizeToFit={true} style={[styles.titleInfo,{flex:1 , marginLeft:'10%',textAlign:'right'}]}>{item.BidDescription}</Text>
-                      </View>
-                      
-                      <View style={styles.container}>
-                          <Text style={styles.titleInfo}>Гүйцэтгэгч :</Text>
-                          <TouchableOpacity 
-                                  onPress={() => this.navigateDetail(this.findUser(item.LancerID))}
-                          >
-                                  <Text style={{fontSize:18,color:'#3389ff'}}>
-                          {this.findUserName(item.LancerID)}
-                          </Text>
-                          </TouchableOpacity>
-                      </View>
-                  </View>
+                <View style={{flex:1}}>
+                    <View style={{margin:10}}>
+                        <Button
+                            icon={
+                            <Icon
+                                name="inbox"
+                                size={18}
+                                color="white"
+                            />
+                            }
+                            buttonStyle={{
+                            backgroundColor:'#4285F4',
+                            }}
+                            onPress={() => {
+                                this.props.navigation.navigate('ChooseBid', {
+                                    id:item.ID
+                                })
+                            }}
+                            title=" Ирсэн саналууд"
+                        />
+                    </View>
                 </View>
+
                 {this.renderSeparator()}
+                {/* <View style={{marginVertical:10}}>
+                    <Text style={{color:'#4285F4'}}>
+                      Төлбөр
+                    </Text>
+                </View> */}
+                {/* <View style={{flex:1}}>
+                    <View style={{margin:10}}>
+                        <Button
+                            icon={
+                              <Icon
+                                name="cc-visa"
+                                size={18}
+                                color="white"
+                              />
+                            }
+                            buttonStyle={{
+                                backgroundColor:'#4285F4',
+                                // width:'50%'
+                            }}
+                            onPress={() => {
+                                this.props.navigation.navigate('ChooseBid', {
+                                    id:item.ID
+                                })
+                            }}
+                            title=" Төлбөр баталгаажуулах"
+                        />
+                    </View>
+                </View> */}
                 {loading3?
                         <ActivityIndicator/>
-                    :payment!=''?
+                    :payment!='0'?
                         <View style={{marginVertical:10}}>
                             <Text style={{color:'#4285F4',}}>Төлбөр баталгаажуулсан дүн</Text>
                             <Text style={{fontSize:18,color:'black',marginTop:5,}}>
@@ -229,15 +257,45 @@ class inProgress extends React.Component {
                             </Text>
                         </View>
                     :
-                    <View style={{marginVertical:10}}>
-                            <Text style={{color:'#4285F4',}}>Төлбөр</Text>
-                            <Text style={{fontSize:18,color:'black',marginTop:5,}}>
-                                Баталгаажаагүй
-                            </Text>
-                    </View>
+                    <View style={{flex:1}}>
+                      <Text style={{color:'#4285F4',}}>Төлбөр баталгаажуулах</Text>
+                      <View style={{ flexDirection:'row'}}>
+                          {/* <Text style={{color:'#4285F4',}}>Баталгаажуулах дүн : </Text> */}
+                          <TextInput style={styles.inputs}
+                              placeholder="Баталгаажуулах дүн"
+                              keyboardType="numeric"
+                              value={this.state.amount}
+                              underlineColorAndroid='transparent'
+                              onChangeText={amount => this.setState({amount})}
+                          />
+                      
+                          <View style={{margin:10,alignItems:'center',alignSelf:'center'}}>
+                              <Button
+                                  icon={
+                                      <Icon
+                                      name="check"
+                                      size={18}
+                                      color="white"
+                                      />
+                                  }
+                                  buttonStyle={{
+                                      backgroundColor:'#4285F4',
+                                      alignSelf:'center'
+                                      // width:'50%'
+                                  }}
+                                  onPress={() => {
+                                      // this.props.navigation.navigate('ChooseBid', {
+                                      //     id:item.ID
+                                      // })
+                                      this.SubmitPayment(item.ID)
+                                      // alert(this.state.amount)
+                                  }}
+                                  title=" Батлах"
+                              />
+                          </View>
+                      </View>
+                  </View>
                   }
-
-                {this.renderSeparator()}
 
                 <View style={{marginVertical:10}}>
                     <Text style={{color:'#4285F4'}}>
@@ -259,15 +317,15 @@ class inProgress extends React.Component {
                       size={25}
                       color="#69d275"
                     />
-                    <Text> - Хүсэлт илгээсэн </Text>
+                    <Text> - Дуусгах хүсэлт зөвшөөрөх </Text>
                   </View>
                   <View style={{flexDirection:'row'}}>
                     <Icon
-                      name="plus-square"
+                      name="times"
                       size={25}
                       color="#69d275"
                     />
-                    <Text> - Дуусгах </Text>
+                    <Text> - Дуусаагүй </Text>
                   </View>
                 </View>
                 <View>
@@ -293,6 +351,7 @@ class inProgress extends React.Component {
                   </View>
               </View>
             </ScrollView>
+            {item.Status=='PendingToFinish'?
             <View style={styles.constContainer}>
                 <TouchableOpacity style={[styles.bidButton,{ alignContent:'center' , flex:1,alignItems:'center'}]} 
                         onPress={() => {
@@ -308,6 +367,9 @@ class inProgress extends React.Component {
                 </TouchableOpacity>
                 
             </View>  
+            :
+                null
+            }
         </View>
         );
     }
@@ -325,12 +387,13 @@ export default connect(
         return {
             getAllWorkers: bindActionCreators(getAllWorkers, dispatch),
             getMilestones:  bindActionCreators(getMilestones, dispatch),
-            onApplyTask: bindActionCreators(onApplyTask, dispatch),
-            onApplyFinish: bindActionCreators(onApplyFinish, dispatch),
+            onComfirmTask: bindActionCreators(onComfirmTask, dispatch),
+            onComfirmFinish: bindActionCreators(onComfirmFinish, dispatch),
+            onSubmitPayment: bindActionCreators(onSubmitPayment, dispatch),
             onCheckPayment: bindActionCreators(onCheckPayment, dispatch),
         }
     }
-)(inProgress);
+)(InProgressUser);
 const styles = StyleSheet.create({
   headerTitle: {
     color: '#fff',
@@ -389,14 +452,6 @@ const styles = StyleSheet.create({
     marginHorizontal:'5%',
     marginVertical:5
   },
-  inputs:{
-    borderColor:'#4285F4',
-    borderWidth:1,
-    width:'50%',
-    height:45,
-    marginVertical:10,
-    alignSelf:'center'
-  },
   constContainer:{
     left:0,
     right:0,
@@ -407,7 +462,6 @@ const styles = StyleSheet.create({
     borderTopColor:'#dcdcdc',
     flexDirection:'row',
     // alignSelf:'center'
-    // position: 'fixed',
     position:'absolute',
     flex:0.1,
   },
@@ -435,6 +489,14 @@ const styles = StyleSheet.create({
     paddingHorizontal:10,
     borderColor:'#4285F4'
 
+  },
+  inputs:{
+    borderColor:'#4285F4',
+    borderWidth:1,
+    width:'50%',
+    height:45,
+    marginVertical:10,
+    alignSelf:'center'
   },
   Summary:{
     width:'70%',
